@@ -1,6 +1,4 @@
-
 package view;
-
 
 import controller.PatientController;
 import java.time.LocalDate;
@@ -8,63 +6,58 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.Patient;
+
 /**
  *
  * @author Radil_Sanjuna
  */
 public class PatientManagmentForm extends javax.swing.JFrame {
 
-private PatientController patientController;
+    private PatientController patientController;
 
-
-public PatientManagmentForm() {
+    public PatientManagmentForm() {
         initComponents();
-        
+
         // 1. You MUST initialize the controller before using it
-        patientController = new PatientController(); 
-        
+        patientController = new PatientController();
+
         setupDateOfBirth();
-        setSize(1024, 768); 
-        setResizable(false); 
-        setLocationRelativeTo(null); 
-        
+        setSize(1160, 780);
+        setResizable(false);
+        setLocationRelativeTo(null);
+
         // 2. Call the method to load the table when the form opens
-        loadPatientsToTable(); 
+        loadPatientsToTable();
     }
-    
-    
-    
+
     private void loadPatientsToTable() {
-    // 1. Get the existing model from your JTable
-    DefaultTableModel tableModel = (DefaultTableModel) tblPatients.getModel();
-    
-    // 2. Clear out any old rows so the data doesn't duplicate when refreshed
-    tableModel.setRowCount(0);
-    
-    // 3. Ask the controller for the list of all patients
-    List<Patient> patientList = patientController.getAllPatients();
-    
-    // 4. Loop through every patient in the list
-    for (Patient p : patientList) {
-        // Create an array representing a single row of data
-        // Make sure your Patient.java model has these exact getter methods
-        Object[] rowData = {
-            p.getPatientId(),
-            p.getFullName(),
-            p.getAddress(),
-            p.getPhoneNumber(),
-            p.getDateOfBirth(), 
-            p.getGender()
-        };
-        
-        // 5. Add the row to the table
-        tableModel.addRow(rowData);
+        // 1. Get the existing model from your JTable
+        DefaultTableModel tableModel = (DefaultTableModel) tblPatients.getModel();
+
+        // 2. Clear out any old rows so the data doesn't duplicate when refreshed
+        tableModel.setRowCount(0);
+
+        // 3. Ask the controller for the list of all patients
+        List<Patient> patientList = patientController.getAllPatients();
+
+        // 4. Loop through every patient in the list
+        for (Patient p : patientList) {
+            // Create an array representing a single row of data
+            // Make sure your Patient.java model has these exact getter methods
+            Object[] rowData = {
+                p.getPatientId(),
+                p.getFullName(),
+                p.getAddress(),
+                p.getPhoneNumber(),
+                p.getDateOfBirth(),
+                p.getGender()
+            };
+
+            // 5. Add the row to the table
+            tableModel.addRow(rowData);
+        }
     }
-}
-    
-    
-    
-    
+
     // Paste this custom method right here:
     private void setupDateOfBirth() {
         // 1. Fill the Year Dropdown (from current year 2026 down to 1920)
@@ -75,8 +68,8 @@ public PatientManagmentForm() {
 
         // 2. Fill the Month Dropdown
         cmbMonth.addItem("Month"); // Placeholder
-        String[] months = {"01 - Jan", "02 - Feb", "03 - Mar", "04 - Apr", "05 - May", "06 - Jun", 
-                           "07 - Jul", "08 - Aug", "09 - Sep", "10 - Oct", "11 - Nov", "12 - Dec"};
+        String[] months = {"01 - Jan", "02 - Feb", "03 - Mar", "04 - Apr", "05 - May", "06 - Jun",
+            "07 - Jul", "08 - Aug", "09 - Sep", "10 - Oct", "11 - Nov", "12 - Dec"};
         for (String m : months) {
             cmbMonth.addItem(m);
         }
@@ -85,11 +78,10 @@ public PatientManagmentForm() {
         cmbDay.addItem("Day"); // Placeholder
         for (int i = 1; i <= 31; i++) {
             // Adds a leading zero to single digits (e.g., 01, 02)
-            String day = String.format("%02d", i); 
+            String day = String.format("%02d", i);
             cmbDay.addItem(day);
         }
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -133,6 +125,7 @@ public PatientManagmentForm() {
         setPreferredSize(new java.awt.Dimension(1024, 768));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 780));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBackground(new java.awt.Color(102, 204, 255));
@@ -146,9 +139,9 @@ public PatientManagmentForm() {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(385, Short.MAX_VALUE)
+                .addContainerGap(443, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 381, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(264, 264, 264))
+                .addGap(316, 316, 316))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -158,7 +151,7 @@ public PatientManagmentForm() {
                 .addGap(17, 17, 17))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 1030, 70));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 1140, 70));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
@@ -166,6 +159,7 @@ public PatientManagmentForm() {
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 190, -1));
 
         jPanel3.setBackground(new java.awt.Color(204, 255, 255));
+        jPanel3.setPreferredSize(new java.awt.Dimension(1000, 700));
 
         jLabel3.setBackground(new java.awt.Color(0, 0, 0));
         jLabel3.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
@@ -214,8 +208,18 @@ public PatientManagmentForm() {
         });
 
         btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
 
         btnSearch.setText("Search");
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -257,27 +261,21 @@ public PatientManagmentForm() {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(26, Short.MAX_VALUE)
+                .addContainerGap(76, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 852, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(32, 32, 32))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(414, 414, 414))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(152, 152, 152)
                                 .addComponent(btnRegister, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(48, 48, 48)
+                                .addGap(18, 18, 18)
                                 .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(31, 31, 31)
+                                .addGap(18, 18, 18)
                                 .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
                                 .addComponent(btnClear)
-                                .addGap(26, 26, 26)
-                                .addComponent(btnBack))
+                                .addGap(18, 18, 18)
+                                .addComponent(btnBack)
+                                .addGap(8, 8, 8))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -303,7 +301,13 @@ public PatientManagmentForm() {
                                             .addComponent(txtPhoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGap(49, 49, 49)
                                         .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(210, 210, 210))))
+                        .addGap(210, 210, 210))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 852, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(32, 32, 32))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addGap(414, 414, 414))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -352,13 +356,15 @@ public PatientManagmentForm() {
                 .addGap(68, 68, 68))
         );
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 110, 930, 650));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, 960, 650));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -371,161 +377,284 @@ public PatientManagmentForm() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnUpdateActionPerformed
 
-    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-
-
-
-String fullName = txtFullName.getText().trim();
-String address = txtAddress.getText().trim();
-String phoneNumber = txtPhoneNumber.getText().trim();
-String gender = cmbGender.getSelectedItem().toString();
-
-// Check whether required text fields are empty
-if (fullName.isEmpty() || address.isEmpty() || phoneNumber.isEmpty()) {
-    JOptionPane.showMessageDialog(this, "Please fill in all required fields.");
-    return;
-}
-
-// Validate patient name
-if (!fullName.matches("[a-zA-Z ]+")) {
-    JOptionPane.showMessageDialog(this,
-            "Full name should contain only letters and spaces.");
-    return;
-}
-
-// Validate phone number
-if (!phoneNumber.matches("^0\\d{9}$")) {
-    JOptionPane.showMessageDialog(this,
-            "Please enter a valid 10-digit phone number.");
-    return;
-}
-
-// Validate gender selection
-if (gender.equals("Select Gender")) {
-    JOptionPane.showMessageDialog(this, "Please select a gender.");
-    return;
-}
-
-// Validate Date of Birth selection
-if (cmbYear.getSelectedIndex() == 0
-        || cmbMonth.getSelectedIndex() == 0
-        || cmbDay.getSelectedIndex() == 0) {
-
-    JOptionPane.showMessageDialog(this,
-            "Please select a complete Date of Birth.");
-    return;
-}
-
-try {
-    int year = Integer.parseInt(cmbYear.getSelectedItem().toString());
-    int month = cmbMonth.getSelectedIndex();
-    int day = Integer.parseInt(cmbDay.getSelectedItem().toString());
-
-    LocalDate dateOfBirth = LocalDate.of(year, month, day);
-
-    // Create Patient object
-    Patient patient = new Patient(
-            0,
-            fullName,
-            address,
-            phoneNumber,
-            dateOfBirth,
-            gender
-    );
-
-    // Send Patient object to the Controller
-    boolean registered = patientController.registerPatient(patient);
-
-    if (registered) {
-        JOptionPane.showMessageDialog(this,
-                "Patient registered successfully.");
-
-        loadPatientsToTable();
-        clearFields();
-
-    } else {
-        JOptionPane.showMessageDialog(this,
-                "Patient registration failed.");
-    }
-
-} catch (Exception e) {
-    JOptionPane.showMessageDialog(this,
-            "An error occurred: " + e.getMessage());
-}
-
-
-
-    }//GEN-LAST:event_btnRegisterActionPerformed
-
-    
-    
-    private void clearFields() {
-txtPatientId.setText("");
-txtFullName.setText("");
-txtAddress.setText("");
-txtPhoneNumber.setText("");
-
-cmbGender.setSelectedIndex(0);
-cmbYear.setSelectedIndex(0);
-cmbMonth.setSelectedIndex(0);
-cmbDay.setSelectedIndex(0);
-
-
-}
-
-    
-    
-    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-
-    // Get Patient ID from the text field
-    String idText = txtPatientId.getText();
-
-    // Check if Patient ID is empty
-    if (idText.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please enter Patient ID");
-        return;
-    }
-
-    try {
-        // Convert Patient ID to an integer
-        int patientId = Integer.parseInt(idText);
-
-        // Search for the patient
-        Patient patient = patientController.searchPatient(patientId);
-
-        // Check whether the patient was found
-        if (patient == null) {
-            JOptionPane.showMessageDialog(this, "Patient not found!");
+        // 1. Get the Patient ID (This is required to know which row to update)
+        String idText = txtPatientId.getText().trim();
+        if (idText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please search for a patient or enter a Patient ID to update.");
             return;
         }
 
-        // Display patient information
-        txtFullName.setText(patient.getFullName());
-        txtAddress.setText(patient.getAddress());
-        txtPhoneNumber.setText(patient.getPhoneNumber());
-        cmbGender.setSelectedItem(patient.getGender());
+        // 2. Get the rest of the text box values
+        String fullName = txtFullName.getText().trim();
+        String address = txtAddress.getText().trim();
+        String phoneNumber = txtPhoneNumber.getText().trim();
+        String gender = cmbGender.getSelectedItem().toString();
 
-        // Display Date of Birth
-        LocalDate dob = patient.getDateOfBirth();
-
-        if (dob != null) {
-            cmbYear.setSelectedItem(String.valueOf(dob.getYear()));
-            cmbDay.setSelectedItem(String.valueOf(dob.getDayOfMonth()));
-            cmbMonth.setSelectedIndex(dob.getMonthValue() - 1);
+        // 3. Check required fields
+        if (fullName.isEmpty() || address.isEmpty() || phoneNumber.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all required fields.");
+            return;
         }
 
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Please enter a valid number");
+        // 4. Validate patient name
+        if (!fullName.matches("[a-zA-Z ]+")) {
+            JOptionPane.showMessageDialog(this, "Full name should contain only letters and spaces.");
+            return;
+        }
+
+        // 5. Validate phone number
+        if (!phoneNumber.matches("^0\\d{9}$")) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid 10-digit phone number.");
+            return;
+        }
+
+        // 6. Validate gender
+        if (gender.equals("Select Gender")) {
+            JOptionPane.showMessageDialog(this, "Please select a gender.");
+            return;
+        }
+
+        // 7. Validate Date of Birth
+        if (cmbYear.getSelectedIndex() == 0 || cmbMonth.getSelectedIndex() == 0 || cmbDay.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(this, "Please select a complete Date of Birth.");
+            return;
+        }
+
+        try {
+            // 8. Convert the extracted ID and Date of Birth into numbers
+            int patientId = Integer.parseInt(idText);
+            int year = Integer.parseInt(cmbYear.getSelectedItem().toString());
+            int month = cmbMonth.getSelectedIndex();
+            int day = Integer.parseInt(cmbDay.getSelectedItem().toString());
+
+            LocalDate dateOfBirth = LocalDate.of(year, month, day);
+
+            // 9. Create the Patient object using the EXISTING ID, not 0
+            Patient patient = new Patient(
+                    patientId,
+                    fullName,
+                    address,
+                    phoneNumber,
+                    dateOfBirth,
+                    gender
+            );
+
+            // 10. Ask the Controller to update the database
+            boolean updated = patientController.updatePatient(patient);
+
+            if (updated) {
+                JOptionPane.showMessageDialog(this, "Patient updated successfully.");
+
+                // Refresh the table to show the changes
+                loadPatientsToTable();
+
+                // If you created a clearFields() method, you can call it here:
+                // clearFields(); 
+            } else {
+                JOptionPane.showMessageDialog(this, "Patient update failed. Check if the ID exists.");
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Patient ID must be a valid number.");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "An error occurred: " + e.getMessage());
+        }
+
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+
+    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
+
+        String fullName = txtFullName.getText().trim();
+        String address = txtAddress.getText().trim();
+        String phoneNumber = txtPhoneNumber.getText().trim();
+        String gender = cmbGender.getSelectedItem().toString();
+
+// Check required fields
+        if (fullName.isEmpty() || address.isEmpty() || phoneNumber.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all required fields.");
+            return;
+        }
+
+// Validate patient name
+        if (!fullName.matches("[a-zA-Z ]+")) {
+            JOptionPane.showMessageDialog(this,
+                    "Full name should contain only letters and spaces.");
+            return;
+        }
+
+// Validate phone number
+        if (!phoneNumber.matches("^0\\d{9}$")) {
+            JOptionPane.showMessageDialog(this,
+                    "Please enter a valid 10-digit phone number.");
+            return;
+        }
+
+// Validate gender
+        if (gender.equals("Select Gender")) {
+            JOptionPane.showMessageDialog(this, "Please select a gender.");
+            return;
+        }
+
+// Validate Date of Birth
+        if (cmbYear.getSelectedIndex() == 0
+                || cmbMonth.getSelectedIndex() == 0
+                || cmbDay.getSelectedIndex() == 0) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Please select a complete Date of Birth.");
+            return;
+        }
+
+        try {
+            int year = Integer.parseInt(cmbYear.getSelectedItem().toString());
+            int month = cmbMonth.getSelectedIndex();
+            int day = Integer.parseInt(cmbDay.getSelectedItem().toString());
+
+            LocalDate dateOfBirth = LocalDate.of(year, month, day);
+
+            // Patient ID is 0 because MySQL will generate the actual ID
+            Patient patient = new Patient(
+                    0,
+                    fullName,
+                    address,
+                    phoneNumber,
+                    dateOfBirth,
+                    gender
+            );
+
+            boolean registered = patientController.registerPatient(patient);
+
+            if (registered) {
+                JOptionPane.showMessageDialog(this,
+                        "Patient registered successfully.");
+
+                loadPatientsToTable();
+                clearFields();
+
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Patient registration failed.");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "An error occurred: " + e.getMessage());
+        }
+
+    }//GEN-LAST:event_btnRegisterActionPerformed
+
+    private void clearFields() {
+
+        txtPatientId.setText("");
+        txtFullName.setText("");
+        txtAddress.setText("");
+        txtPhoneNumber.setText("");
+        cmbGender.setSelectedIndex(0);
+        cmbYear.setSelectedIndex(0);
+        cmbMonth.setSelectedIndex(0);
+        cmbDay.setSelectedIndex(0);
+
     }
+
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+
+        // Get Patient ID from the text field
+        String idText = txtPatientId.getText();
+
+        // Check if Patient ID is empty
+        if (idText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter Patient ID");
+            return;
+        }
+
+        try {
+            // Convert Patient ID to an integer
+            int patientId = Integer.parseInt(idText);
+
+            // Search for the patient
+            Patient patient = patientController.searchPatient(patientId);
+
+            // Check whether the patient was found
+            if (patient == null) {
+                JOptionPane.showMessageDialog(this, "Patient not found!");
+                return;
+            }
+
+            // Display patient information
+            txtFullName.setText(patient.getFullName());
+            txtAddress.setText(patient.getAddress());
+            txtPhoneNumber.setText(patient.getPhoneNumber());
+            cmbGender.setSelectedItem(patient.getGender());
+
+            // Display Date of Birth
+            LocalDate dob = patient.getDateOfBirth();
+
+            if (dob != null) {
+                cmbYear.setSelectedItem(String.valueOf(dob.getYear()));
+                cmbDay.setSelectedItem(String.valueOf(dob.getDayOfMonth()));
+                cmbMonth.setSelectedIndex(dob.getMonthValue() - 1);
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid number");
+        }
 
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnBackActionPerformed
+AdminDashboardForm dashboard = new AdminDashboardForm();
+    dashboard.setVisible(true);
+    this.dispose();    }//GEN-LAST:event_btnBackActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        // 1. Get the Patient ID
+        String idText = txtPatientId.getText().trim();
+
+        // 2. Check if the ID text box is empty
+        if (idText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please search for a patient or enter a Patient ID to delete.");
+            return;
+        }
+
+        try {
+            int patientId = Integer.parseInt(idText);
+
+            // 3. Ask the user if they are absolutely sure (Yes/No dialog)
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to delete Patient ID: " + patientId + "?",
+                    "Confirm Delete",
+                    JOptionPane.YES_NO_OPTION);
+
+            // 4. If they clicked "Yes", proceed with deletion
+            if (confirm == JOptionPane.YES_OPTION) {
+
+                // Ask the Controller to delete the patient from the database
+                boolean isDeleted = patientController.deletePatient(patientId);
+
+                if (isDeleted) {
+                    JOptionPane.showMessageDialog(this, "Patient deleted successfully.");
+
+                    // Refresh the table to remove the deleted row
+                    loadPatientsToTable();
+
+                    // Clear the text boxes
+                    clearFields();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Delete failed. Check if the Patient ID exists.");
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Patient ID must be a valid number.");
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        clearFields();
+    }//GEN-LAST:event_btnClearActionPerformed
 
     /**
      * @param args the command line arguments

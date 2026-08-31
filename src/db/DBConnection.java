@@ -24,7 +24,7 @@ public class DBConnection {
                         "root",                                         
                         ""                                              
                 );
-                System.out.println("Database connected successfully via Singleton!");
+                System.out.println("Database connected successfully!");
             }
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Connection failed: " + e.getMessage());
