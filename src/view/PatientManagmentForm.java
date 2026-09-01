@@ -58,7 +58,6 @@ public class PatientManagmentForm extends javax.swing.JFrame {
         }
     }
 
-    // Paste this custom method right here:
     private void setupDateOfBirth() {
         // 1. Fill the Year Dropdown (from current year 2026 down to 1920)
         cmbYear.addItem("Year"); // Placeholder at the top
@@ -126,6 +125,7 @@ public class PatientManagmentForm extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setMinimumSize(new java.awt.Dimension(1160, 780));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 760));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBackground(new java.awt.Color(102, 204, 255));
@@ -185,6 +185,12 @@ public class PatientManagmentForm extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(0, 0, 0));
         jLabel7.setText("Date of Birth :");
+
+        cmbMonth.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbMonthActionPerformed(evt);
+            }
+        });
 
         jLabel8.setBackground(new java.awt.Color(0, 0, 0));
         jLabel8.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
@@ -561,46 +567,42 @@ public class PatientManagmentForm extends javax.swing.JFrame {
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
 
-        // Get Patient ID from the text field
-        String idText = txtPatientId.getText();
+       // Get text from the search field (ID or Phone)
+    String searchText = txtPatientId.getText().trim();
 
-        // Check if Patient ID is empty
-        if (idText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter Patient ID");
+    // Check if the search box is empty
+    if (searchText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter Patient ID or Phone Number");
+        return;
+    }
+
+    try {
+        // Search using the new Controller method
+        Patient patient = patientController.searchPatientByIdOrPhone(searchText);
+
+        // Check whether the patient was found
+        if (patient == null) {
+            JOptionPane.showMessageDialog(this, "Patient not found! Please check the ID or Phone Number.");
             return;
         }
 
-        try {
-            // Convert Patient ID to an integer
-            int patientId = Integer.parseInt(idText);
+        // Display patient information
+        txtFullName.setText(patient.getFullName());
+        txtAddress.setText(patient.getAddress());
+        txtPhoneNumber.setText(patient.getPhoneNumber());
+        cmbGender.setSelectedItem(patient.getGender());
 
-            // Search for the patient
-            Patient patient = patientController.searchPatient(patientId);
-
-            // Check whether the patient was found
-            if (patient == null) {
-                JOptionPane.showMessageDialog(this, "Patient not found!");
-                return;
-            }
-
-            // Display patient information
-            txtFullName.setText(patient.getFullName());
-            txtAddress.setText(patient.getAddress());
-            txtPhoneNumber.setText(patient.getPhoneNumber());
-            cmbGender.setSelectedItem(patient.getGender());
-
-            // Display Date of Birth
-            LocalDate dob = patient.getDateOfBirth();
-
-            if (dob != null) {
-                cmbYear.setSelectedItem(String.valueOf(dob.getYear()));
-                cmbDay.setSelectedItem(String.valueOf(dob.getDayOfMonth()));
-                cmbMonth.setSelectedIndex(dob.getMonthValue() - 1);
-            }
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid number");
+        // Display Date of Birth
+        LocalDate dob = patient.getDateOfBirth();
+        if (dob != null) {
+            cmbYear.setSelectedItem(String.valueOf(dob.getYear()));
+            cmbDay.setSelectedItem(String.valueOf(dob.getDayOfMonth()));
+            cmbMonth.setSelectedIndex(dob.getMonthValue() - 1);
         }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "An error occurred: " + e.getMessage());
+    }
 
     }//GEN-LAST:event_btnSearchActionPerformed
 
@@ -655,6 +657,10 @@ AdminDashboardForm dashboard = new AdminDashboardForm();
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         clearFields();
     }//GEN-LAST:event_btnClearActionPerformed
+
+    private void cmbMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMonthActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbMonthActionPerformed
 
     /**
      * @param args the command line arguments

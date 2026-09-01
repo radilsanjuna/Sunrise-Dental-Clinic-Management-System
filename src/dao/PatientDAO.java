@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,37 +42,48 @@ public class PatientDAO {
     }
 }
     
+    
+    
     //this section can search patient using id
-    public Patient getPatientById(int patientId) {
-
-    String sql = "SELECT * FROM patients WHERE patient_id = ?";
+public Patient getPatientByIdOrPhone(String searchText) {
+    String sql = "SELECT * FROM patients WHERE patient_id = ? OR phone_number = ?";
 
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setInt(1, patientId);
+        int searchId = -1;
+        try {
+            searchId = Integer.parseInt(searchText);
+        } catch (NumberFormatException e) {
+            // It's not a valid integer (e.g., contains text or is too long), keep searchId as -1
+        }
+
+        stmt.setInt(1, searchId);
+        stmt.setString(2, searchText);
 
         try (ResultSet rs = stmt.executeQuery()) {
-
             if (rs.next()) {
+                
+                // SAFE DATE HANDLING: Check if DOB is null in the database first
+                java.sql.Date sqlDate = rs.getDate("dob");
+                LocalDate dob = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
                 return new Patient(
                     rs.getInt("patient_id"),
                     rs.getString("full_name"),
                     rs.getString("address"),
                     rs.getString("phone_number"),
-                    rs.getDate("dob").toLocalDate(),
+                    dob, // Use the safely checked date variable here
                     rs.getString("gender")
                 );
             }
         }
-
     } catch (SQLException e) {
-        System.out.println("Error finding this patient: " + e.getMessage());
+        System.out.println("Error searching patient: " + e.getMessage());
     }
-
     return null;
 }
+
    
     
     public boolean updatePatient(Patient patient) {

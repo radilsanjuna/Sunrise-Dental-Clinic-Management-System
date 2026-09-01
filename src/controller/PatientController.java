@@ -23,9 +23,9 @@ public class PatientController {
     }
 
     // Search for a patient by ID
-    public Patient searchPatient(int patientId) {
-        return patientDAO.getPatientById(patientId);
-    }
+public Patient searchPatientByIdOrPhone(String searchText) {
+    return patientDAO.getPatientByIdOrPhone(searchText);
+}
 
     // Update patient details
     public boolean updatePatient(Patient patient) {

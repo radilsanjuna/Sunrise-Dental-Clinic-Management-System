@@ -181,8 +181,13 @@ public class AdminDashboardForm extends javax.swing.JFrame {
 }    }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnManageUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageUsersActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnManageUsersActionPerformed
+   UserManagementForm userForm = new UserManagementForm();
+    
+    // 2. Make the new form visible on the screen
+    userForm.setVisible(true);
+    
+    // 3. Close the current Admin Dashboard window so you don't have too many windows open
+    this.dispose();     }//GEN-LAST:event_btnManageUsersActionPerformed
 
     private void btnManagepatientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManagepatientsActionPerformed
 // 1. Create a new object of your Patient Management Form
