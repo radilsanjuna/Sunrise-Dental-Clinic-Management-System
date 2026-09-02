@@ -186,6 +186,12 @@ public class PatientManagmentForm extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(0, 0, 0));
         jLabel7.setText("Date of Birth :");
 
+        cmbYear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbYearActionPerformed(evt);
+            }
+        });
+
         cmbMonth.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbMonthActionPerformed(evt);
@@ -661,6 +667,10 @@ AdminDashboardForm dashboard = new AdminDashboardForm();
     private void cmbMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMonthActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbMonthActionPerformed
+
+    private void cmbYearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbYearActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbYearActionPerformed
 
     /**
      * @param args the command line arguments

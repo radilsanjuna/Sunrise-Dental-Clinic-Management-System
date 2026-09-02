@@ -7,33 +7,45 @@ package model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-
 public class Appointment {
-    
+
     private int appointmentId;
     private String appointmentNumber;
+
+    private int patientId;
+    private int dentistId;
+    private int treatmentId;
+
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
-    
-    
-       // Relationships
-    // check aii mewa damme kiyana eka
-    private Patient patient;
-    private Dentist dentist;
-    private Treatment treatment;
 
-       // Default constructor
+    private String notes;
+
+    // Display-only fields used when showing appointment information
+    private String patientName;
+    private String dentistName;
+    private String treatmentName;
+
     public Appointment() {
     }
 
-    public Appointment(int appointmentId, String appointmentNumber, LocalDate appointmentDate, LocalTime appointmentTime, Patient patient, Dentist dentist, Treatment treatment) {
+    public Appointment(int appointmentId,
+                       String appointmentNumber,
+                       int patientId,
+                       int dentistId,
+                       int treatmentId,
+                       LocalDate appointmentDate,
+                       LocalTime appointmentTime,
+                       String notes) {
+
         this.appointmentId = appointmentId;
         this.appointmentNumber = appointmentNumber;
+        this.patientId = patientId;
+        this.dentistId = dentistId;
+        this.treatmentId = treatmentId;
         this.appointmentDate = appointmentDate;
         this.appointmentTime = appointmentTime;
-        this.patient = patient;
-        this.dentist = dentist;
-        this.treatment = treatment;
+        this.notes = notes;
     }
 
     public int getAppointmentId() {
@@ -52,6 +64,30 @@ public class Appointment {
         this.appointmentNumber = appointmentNumber;
     }
 
+    public int getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(int patientId) {
+        this.patientId = patientId;
+    }
+
+    public int getDentistId() {
+        return dentistId;
+    }
+
+    public void setDentistId(int dentistId) {
+        this.dentistId = dentistId;
+    }
+
+    public int getTreatmentId() {
+        return treatmentId;
+    }
+
+    public void setTreatmentId(int treatmentId) {
+        this.treatmentId = treatmentId;
+    }
+
     public LocalDate getAppointmentDate() {
         return appointmentDate;
     }
@@ -68,30 +104,35 @@ public class Appointment {
         this.appointmentTime = appointmentTime;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public String getNotes() {
+        return notes;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
-    public Dentist getDentist() {
-        return dentist;
+    public String getPatientName() {
+        return patientName;
     }
 
-    public void setDentist(Dentist dentist) {
-        this.dentist = dentist;
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
     }
 
-    public Treatment getTreatment() {
-        return treatment;
-   }
+    public String getDentistName() {
+        return dentistName;
+    }
 
-   public void setTreatment(Treatment treatment) {
-        this.treatment = treatment;
-  }
-    
-    
-    
+    public void setDentistName(String dentistName) {
+        this.dentistName = dentistName;
+    }
+
+    public String getTreatmentName() {
+        return treatmentName;
+    }
+
+    public void setTreatmentName(String treatmentName) {
+        this.treatmentName = treatmentName;
+    }
 }

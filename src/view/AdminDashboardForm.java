@@ -16,9 +16,9 @@ public class AdminDashboardForm extends javax.swing.JFrame {
      */
     public AdminDashboardForm() {
         initComponents();
-    setSize(1160, 780); 
-   setResizable(false); // Optional: Stops the user from resizing the window
-    setLocationRelativeTo(null); // Opt
+        setSize(1160, 780);
+        setResizable(false); 
+        setLocationRelativeTo(null); 
     }
 
     @SuppressWarnings("unchecked")
@@ -29,7 +29,7 @@ public class AdminDashboardForm extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        btnManageAppoinments = new javax.swing.JButton();
+        btnManageAppoinmentsSchedule = new javax.swing.JButton();
         btnManagepatients = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
         btnBilling = new javax.swing.JButton();
@@ -37,6 +37,7 @@ public class AdminDashboardForm extends javax.swing.JFrame {
         btnManageUsers = new javax.swing.JButton();
         btnManagetreatments = new javax.swing.JButton();
         btnManageDentist = new javax.swing.JButton();
+        btnManageAppoinments1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,7 +72,12 @@ public class AdminDashboardForm extends javax.swing.JFrame {
 
         jPanel3.setBackground(new java.awt.Color(102, 204, 255));
 
-        btnManageAppoinments.setText(" Manage Appoinment");
+        btnManageAppoinmentsSchedule.setText(" Manage Appoinment Schedule");
+        btnManageAppoinmentsSchedule.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnManageAppoinmentsScheduleActionPerformed(evt);
+            }
+        });
 
         btnManagepatients.setText("Manage Patients");
         btnManagepatients.addActionListener(new java.awt.event.ActionListener() {
@@ -99,8 +105,25 @@ public class AdminDashboardForm extends javax.swing.JFrame {
         });
 
         btnManagetreatments.setText("Manage Treatments");
+        btnManagetreatments.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnManagetreatmentsActionPerformed(evt);
+            }
+        });
 
         btnManageDentist.setText("Manage Dentist");
+        btnManageDentist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnManageDentistActionPerformed(evt);
+            }
+        });
+
+        btnManageAppoinments1.setText(" Manage Appoinment");
+        btnManageAppoinments1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnManageAppoinments1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -109,14 +132,15 @@ public class AdminDashboardForm extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnManageAppoinments, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnLogout, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(btnViewreports, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(btnBilling, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(btnManagepatients, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(btnManageUsers, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(btnManagetreatments, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(btnManageDentist, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
+                    .addComponent(btnManageAppoinmentsSchedule, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnViewreports, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnBilling, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnManagepatients, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnManageUsers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnManagetreatments, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnManageDentist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnManageAppoinments1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -124,21 +148,23 @@ public class AdminDashboardForm extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(83, 83, 83)
                 .addComponent(btnManagepatients, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(btnManageAppoinments1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnManageAppoinments, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnManageAppoinmentsSchedule, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnManageDentist, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnManagetreatments, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnManageUsers, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(btnBilling, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(12, 12, 12)
                 .addComponent(btnViewreports, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addContainerGap(76, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 200, 670));
@@ -147,9 +173,10 @@ public class AdminDashboardForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1154, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -199,6 +226,30 @@ public class AdminDashboardForm extends javax.swing.JFrame {
     // 3. Close the current Admin Dashboard window so you don't have too many windows open
     this.dispose();    }//GEN-LAST:event_btnManagepatientsActionPerformed
 
+    private void btnManageAppoinments1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageAppoinments1ActionPerformed
+       AppoinmentManagementForm appoinment = new AppoinmentManagementForm();
+       appoinment.setVisible(true);
+       this.dispose();
+    }//GEN-LAST:event_btnManageAppoinments1ActionPerformed
+
+    private void btnManageAppoinmentsScheduleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageAppoinmentsScheduleActionPerformed
+        ScheduleManagementForm schedule = new ScheduleManagementForm();
+
+        schedule.setVisible(true);
+        this.dispose();               }//GEN-LAST:event_btnManageAppoinmentsScheduleActionPerformed
+
+    private void btnManageDentistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageDentistActionPerformed
+       DentistManagementForm dentist = new DentistManagementForm();
+       dentist.setVisible(true);
+       this.dispose();
+    }//GEN-LAST:event_btnManageDentistActionPerformed
+
+    private void btnManagetreatmentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManagetreatmentsActionPerformed
+        TreatmentManagementForm treatment = new TreatmentManagementForm();
+        treatment.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnManagetreatmentsActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -237,7 +288,8 @@ public class AdminDashboardForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBilling;
     private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnManageAppoinments;
+    private javax.swing.JButton btnManageAppoinments1;
+    private javax.swing.JButton btnManageAppoinmentsSchedule;
     private javax.swing.JButton btnManageDentist;
     private javax.swing.JButton btnManageUsers;
     private javax.swing.JButton btnManagepatients;

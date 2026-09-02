@@ -3,44 +3,69 @@ package controller;
 import dao.AppointmentDAO;
 import model.Appointment;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class AppointmentController {
 
     private AppointmentDAO appointmentDAO;
 
-    // Constructor
     public AppointmentController() {
         appointmentDAO = new AppointmentDAO();
     }
 
-    // 1. Add Appointment
+    // Add a new appointment
     public boolean addAppointment(Appointment appointment) {
-
         return appointmentDAO.addAppointment(appointment);
     }
 
-//    // 2. Search Appointment
-//    public Appointment searchAppointment(String appointmentNumber) {
-//
-//        return appointmentDAO.searchAppointment(appointmentNumber);
-//    }
+    // Search appointment by appointment number
+    public Appointment searchAppointment(String appointmentNumber) {
+        return appointmentDAO.searchAppointment(appointmentNumber);
+    }
 
-    // 3. Update Appointment
+    // Update an existing appointment
     public boolean updateAppointment(Appointment appointment) {
-
         return appointmentDAO.updateAppointment(appointment);
     }
 
-    // 4. Delete Appointment
+    // Delete an appointment
     public boolean deleteAppointment(int appointmentId) {
-
         return appointmentDAO.deleteAppointment(appointmentId);
     }
 
-//    // 5. Get All Appointments
-//    public List<Appointment> getAllAppointments() {
-//
-//        return appointmentDAO.getAllAppointments();
-//    }
+    // Get all appointments
+    public List<Appointment> getAllAppointments() {
+        return appointmentDAO.getAllAppointments();
+    }
+
+    // Check whether a time slot is already booked
+    public boolean isTimeSlotBooked(
+            int dentistId,
+            LocalDate appointmentDate,
+            LocalTime appointmentTime) {
+
+        return appointmentDAO.isTimeSlotBooked(
+                dentistId,
+                appointmentDate,
+                appointmentTime
+        );
+    }
+
+    // Get appointments for a dentist on a specific date
+    public List<Appointment> getAppointmentsByDentistAndDate(
+            int dentistId,
+            LocalDate appointmentDate) {
+
+        return appointmentDAO.getAppointmentsByDentistAndDate(
+                dentistId,
+                appointmentDate
+        );
+    }
+
+    // Generate the next appointment number
+    public String generateAppointmentNumber() {
+        return appointmentDAO.generateAppointmentNumber();
+    }
 }

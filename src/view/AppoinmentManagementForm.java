@@ -1,14 +1,25 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package view;
 
+import controller.AppointmentController;
 import controller.PatientController;
 import java.time.LocalDate;
-import java.util.List;
+
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import model.Patient;
+
+import controller.DentistController;
+import controller.TreatmentController;
+import model.Dentist;
+import java.util.List;
+import model.Treatment;
+
+import controller.DentistScheduleController;
+import model.DentistSchedule;
+import java.time.LocalTime;
+
+import model.Appointment;
 
 /**
  *
@@ -16,44 +27,493 @@ import model.Patient;
  */
 public class AppoinmentManagementForm extends javax.swing.JFrame {
     
-    PatientController patientController = new PatientController(); 
+   private PatientController patientController;
+    private DentistController dentistController;
+    private TreatmentController treatmentController;
+    private DentistScheduleController scheduleController;
+    private AppointmentController appointmentController;
+    private List<Patient> patientList;
+    private List<Dentist> dentistList;
+    private List<Treatment> treatmentList;
     
 public AppoinmentManagementForm() {
-    // Add "PatientController" before the variable name here:
+  initComponents();
 
-    initComponents();
+    // Initialize controllers after GUI components are created
+    patientController = new PatientController();
+dentistController = new DentistController();
+treatmentController = new TreatmentController();
+scheduleController = new DentistScheduleController();
+appointmentController = new AppointmentController();
     setupDateOfBirth();
+
+    // Set form properties
     setSize(1160, 780);
     setResizable(false);
     setLocationRelativeTo(null);
+
+    // Load initial patient data
+    loadPatients();
+      loadDentists();
+      loadTreatments();
+      loadAppointments();
+    
 }
 
     
-       private void setupDateOfBirth() {
-        // 1. Fill the Year Dropdown (from current year 2026 down to 1920)
-        cmbYear.addItem("Year"); // Placeholder at the top
-        for (int i = 2026; i >= 1920; i--) {
-            cmbYear.addItem(String.valueOf(i));
+
+
+private void loadAppointments() {
+
+    List<Appointment> appointmentList =
+            appointmentController.getAllAppointments();
+
+    DefaultTableModel model =
+            (DefaultTableModel) tblAppoinment.getModel();
+
+    model.setRowCount(0);
+
+    if (appointmentList == null) {
+        return;
+    }
+
+    for (Appointment appointment : appointmentList) {
+
+        model.addRow(new Object[]{
+            appointment.getAppointmentId(),
+            appointment.getAppointmentNumber(),
+            appointment.getPatientName(),
+            appointment.getDentistName(),
+            appointment.getTreatmentName(),
+            appointment.getAppointmentDate(),
+            appointment.getAppointmentTime()
+        });
+    }
+}
+
+
+
+private boolean isTimeSlotBookedByAnotherAppointment(
+        int dentistId,
+        LocalDate appointmentDate,
+        LocalTime appointmentTime,
+        int appointmentId) {
+
+    List<Appointment> appointments =
+            appointmentController.getAppointmentsByDentistAndDate(
+                    dentistId,
+                    appointmentDate
+            );
+
+    if (appointments == null) {
+        return false;
+    }
+
+    for (Appointment appointment : appointments) {
+
+        if (appointment.getAppointmentId() != appointmentId
+                && appointment.getAppointmentTime().equals(appointmentTime)) {
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+private void loadAvailableTimes() {
+
+    cmbTime.removeAllItems();
+    cmbTime.addItem("Select Time");
+
+    int dentistId = getSelectedDentistId();
+
+    if (dentistId == -1) {
+        return;
+    }
+
+    // Check whether all date values are available
+    if (cmbYear.getSelectedItem() == null
+            || cmbMonth.getSelectedItem() == null
+            || cmbDay.getSelectedItem() == null) {
+        return;
+    }
+
+    if (cmbYear.getSelectedIndex() == 0
+            || cmbMonth.getSelectedIndex() == 0
+            || cmbDay.getSelectedIndex() == 0) {
+        return;
+    }
+
+    try {
+
+        int year = Integer.parseInt(
+                cmbYear.getSelectedItem().toString()
+        );
+
+        int month = cmbMonth.getSelectedIndex();
+
+        int day = Integer.parseInt(
+                cmbDay.getSelectedItem().toString()
+        );
+
+        LocalDate appointmentDate =
+                LocalDate.of(year, month, day);
+
+        // Find the dentist's schedule for the selected date
+        DentistSchedule schedule =
+                scheduleController.getScheduleByDentistAndDate(
+                        dentistId,
+                        appointmentDate
+                );
+
+        if (schedule == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "The selected dentist is not available on this date."
+            );
+
+            return;
         }
 
-        // 2. Fill the Month Dropdown
-        cmbMonth.addItem("Month"); // Placeholder
-        String[] months = {"01 - Jan", "02 - Feb", "03 - Mar", "04 - Apr", "05 - May", "06 - Jun",
-            "07 - Jul", "08 - Aug", "09 - Sep", "10 - Oct", "11 - Nov", "12 - Dec"};
-        for (String m : months) {
-            cmbMonth.addItem(m);
+        LocalTime startTime = schedule.getStartTime();
+        LocalTime endTime = schedule.getEndTime();
+
+        LocalTime currentTime = startTime;
+
+        // Generate 30-minute appointment slots
+        while (currentTime.plusMinutes(30).compareTo(endTime) <= 0) {
+
+            boolean booked =
+                    appointmentController.isTimeSlotBooked(
+                            dentistId,
+                            appointmentDate,
+                            currentTime
+                    );
+
+            if (!booked) {
+
+                cmbTime.addItem(
+                        currentTime.toString()
+                );
+            }
+
+            currentTime =
+                    currentTime.plusMinutes(30);
         }
 
-        // 3. Fill the Day Dropdown (1 to 31)
-        cmbDay.addItem("Day"); // Placeholder
-        for (int i = 1; i <= 31; i++) {
-            // Adds a leading zero to single digits (e.g., 01, 02)
-            String day = String.format("%02d", i);
-            cmbDay.addItem(day);
-        
-        }}
+    } catch (Exception e) {
+
+        // Ignore temporary combo box changes
+        return;
+    }
+}
+
+
+
+
+
+private void loadTreatments() {
+
+    cmbTreatment.removeAllItems();
+
+    cmbTreatment.addItem("Select Treatment");
+
+    treatmentList = treatmentController.getAllTreatments();
+
+    if (treatmentList == null) {
+        return;
+    }
+
+    for (Treatment treatment : treatmentList) {
+
+        cmbTreatment.addItem(
+                treatment.getTreatmentName()
+        );
+    }
+}
+
+
+
+private int getSelectedTreatmentId() {
+
+    int selectedIndex = cmbTreatment.getSelectedIndex();
+
+    if (selectedIndex <= 0 || treatmentList == null) {
+        return -1;
+    }
+
+    return treatmentList
+            .get(selectedIndex - 1)
+            .getTreatmentId();
+}
+
+
+
+
+
+  private void setupDateOfBirth() {
+
+    // Fill the Year dropdown
+    cmbYear.removeAllItems();
+    cmbYear.addItem("Year");
+
+    int currentYear =
+            LocalDate.now().getYear();
+
+    for (int i = currentYear; i <= currentYear + 2; i++) {
+
+        cmbYear.addItem(
+                String.valueOf(i)
+        );
+    }
+
+    // Fill the Month dropdown
+    cmbMonth.removeAllItems();
+    cmbMonth.addItem("Month");
+
+    String[] months = {
+        "01 - Jan",
+        "02 - Feb",
+        "03 - Mar",
+        "04 - Apr",
+        "05 - May",
+        "06 - Jun",
+        "07 - Jul",
+        "08 - Aug",
+        "09 - Sep",
+        "10 - Oct",
+        "11 - Nov",
+        "12 - Dec"
+    };
+
+    for (String month : months) {
+
+        cmbMonth.addItem(month);
+    }
+
+    // Fill the Day dropdown
+    cmbDay.removeAllItems();
+    cmbDay.addItem("Day");
+
+    for (int i = 1; i <= 31; i++) {
+
+        cmbDay.addItem(
+                String.format("%02d", i)
+        );
+    }
+}
+  
+  
+  
+  private void loadPatients() {
+
+    patientList =
+            patientController.getAllPatients();
+
+    if (patientList == null) {
+        return;
+    }
+}
+
+
+
+
+
+
+
+
+
+private void loadDentists() {
+
+    cmbDentist.removeAllItems();
+
+    cmbDentist.addItem("Select Dentist");
+
+    dentistList = dentistController.getAllDentists();
+
+    if (dentistList == null) {
+        return;
+    }
+
+    for (Dentist dentist : dentistList) {
+
+        cmbDentist.addItem(
+                dentist.getFullName()
+        );
+    }
+}
+
+
+
+
+
+private int getSelectedDentistId() {
+
+    int selectedIndex = cmbDentist.getSelectedIndex();
+
+    if (selectedIndex <= 0 || dentistList == null) {
+        return -1;
+    }
+
+    return dentistList
+            .get(selectedIndex - 1)
+            .getDentistId();
+}
+
+  
+
+
+private void loadAppointmentToForm(Appointment appointment) {
+
+    if (appointment == null) {
+        return;
+    }
+
+    txtPatientId.setText(
+            String.valueOf(appointment.getPatientId())
+    );
+
+    txtPatientName.setText(
+            appointment.getPatientName()
+    );
+
+    // Load patient's phone number
+ Patient patient =
+        patientController.searchPatientByIdOrPhone(
+                String.valueOf(appointment.getPatientId())
+        );
+
+if (patient != null) {
+    txtPhone.setText(
+            patient.getPhoneNumber()
+    );
+} else {
+    txtPhone.setText("");
+}
+
+    // Select dentist
+    for (int i = 0; i < dentistList.size(); i++) {
+
+        if (dentistList.get(i).getDentistId()
+                == appointment.getDentistId()) {
+
+            cmbDentist.setSelectedIndex(i + 1);
+            break;
+        }
+    }
+
+    // Select treatment
+    cmbTreatment.setSelectedItem(
+            appointment.getTreatmentName()
+    );
+
+    // Set date
+    LocalDate date =
+            appointment.getAppointmentDate();
+
+    cmbYear.setSelectedItem(
+            String.valueOf(date.getYear())
+    );
+
+    cmbMonth.setSelectedIndex(
+            date.getMonthValue()
+    );
+
+    cmbDay.setSelectedItem(
+            String.format(
+                    "%02d",
+                    date.getDayOfMonth()
+            )
+    );
+
+    // Load available appointment times
+    loadAvailableTimes();
+
+    // Select appointment time
+    if (appointment.getAppointmentTime() != null) {
+
+        String appointmentTime =
+                appointment.getAppointmentTime().toString();
+
+        boolean timeExists = false;
+
+        for (int i = 0; i < cmbTime.getItemCount(); i++) {
+
+            if (appointmentTime.equals(
+                    cmbTime.getItemAt(i))) {
+
+                timeExists = true;
+                break;
+            }
+        }
+
+        if (!timeExists) {
+            cmbTime.addItem(appointmentTime);
+        }
+
+        cmbTime.setSelectedItem(appointmentTime);
+    }
+
+    // Set notes
+    if (appointment.getNotes() != null) {
+        txtNote.setText(
+                appointment.getNotes()
+        );
+    } else {
+        txtNote.setText("");
+    }
+}
+
+
+
+
+
+ 
+private void clearFields() {
+
+    // Clear appointment search
+    txtAppointmentNumber.setText("");
+
+    // Clear patient search
+    txtSearchPatient.setText("");
+
+    // Clear selected patient details
+    txtPatientId.setText("");
+    txtPatientName.setText("");
+    txtPhone.setText("");
+
+    // Reset date fields
+    cmbYear.setSelectedIndex(0);
+    cmbMonth.setSelectedIndex(0);
+    cmbDay.setSelectedIndex(0);
+
+    // Reset dentist, treatment and time
+    cmbDentist.setSelectedIndex(0);
+    cmbTreatment.setSelectedIndex(0);
+    cmbTime.setSelectedIndex(0);
+
+    // Clear notes
+    txtNote.setText("");
+
+    // Clear patient search results
+    DefaultTableModel patientModel =
+            (DefaultTableModel) tblPatient.getModel();
+
+    patientModel.setRowCount(0);
+
+    // Clear appointment table selection
+    tblAppoinment.clearSelection();
+}
+
     
-    
+
+
+  
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -63,34 +523,64 @@ public AppoinmentManagementForm() {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        txtSearch = new javax.swing.JTextField();
-        txtFullName = new javax.swing.JTextField();
-        txtAddress = new javax.swing.JTextField();
-        txtPhoneNumber = new javax.swing.JTextField();
+        txtSearchPatient = new javax.swing.JTextField();
+        btnSelectPatient = new javax.swing.JButton();
+        btnSearchPatient = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblPatient = new javax.swing.JTable();
+        btnAddPatient = new javax.swing.JButton();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        cmbDentist = new javax.swing.JComboBox<>();
+        cmbTreatment = new javax.swing.JComboBox<>();
         cmbYear = new javax.swing.JComboBox<>();
         cmbMonth = new javax.swing.JComboBox<>();
         cmbDay = new javax.swing.JComboBox<>();
-        cmbGender = new javax.swing.JComboBox<>();
-        btnRegister = new javax.swing.JButton();
-        btnSearch = new javax.swing.JButton();
+        jLabel16 = new javax.swing.JLabel();
+        txtPatientId = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
+        txtPatientName = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        txtPhone = new javax.swing.JTextField();
+        cmbTime = new javax.swing.JComboBox<>();
+        txtNote = new javax.swing.JTextField();
+        btnAdd = new javax.swing.JButton();
+        btnUpdate = new javax.swing.JButton();
+        btnDelete = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblAppoinment = new javax.swing.JTable();
+        jLabel6 = new javax.swing.JLabel();
+        txtAppointmentNumber = new javax.swing.JTextField();
+        btnSearchAppoinment = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -102,7 +592,7 @@ public AppoinmentManagementForm() {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI Light", 0, 25)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("Patient Management ");
+        jLabel1.setText("Appoinment Management ");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -123,73 +613,6 @@ public AppoinmentManagementForm() {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 1160, 70));
 
-        jPanel3.setBackground(new java.awt.Color(204, 255, 255));
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("APPOINTMENT DETAILS");
-
-        jLabel10.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel10.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel10.setText("Appoinment ID :");
-
-        jLabel11.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel11.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel11.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel11.setText("Dentist :");
-
-        jLabel12.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel12.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel12.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel12.setText("Treatment :");
-
-        jLabel13.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel13.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel13.setText("Date :");
-
-        jLabel14.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel14.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel14.setText("Time :");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(334, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3)
-                .addGap(31, 31, 31)
-                .addComponent(jLabel10)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel11)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel12)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel13)
-                .addGap(21, 21, 21)
-                .addComponent(jLabel14)
-                .addContainerGap(398, Short.MAX_VALUE))
-        );
-
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 100, 530, 630));
-
         jPanel4.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
@@ -199,32 +622,95 @@ public AppoinmentManagementForm() {
         jLabel4.setBackground(new java.awt.Color(0, 0, 0));
         jLabel4.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("Search ID/Phone No :");
+        jLabel4.setText("Search Patient :");
 
         jLabel5.setBackground(new java.awt.Color(0, 0, 0));
         jLabel5.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel5.setText("Full Name :");
-
-        jLabel6.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel6.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("Address :");
-
-        jLabel7.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel7.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel7.setText("Phone Number :");
-
-        jLabel8.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel8.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("Date of Birth :");
+        jLabel5.setText("Search Results");
 
         jLabel9.setBackground(new java.awt.Color(0, 0, 0));
         jLabel9.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel9.setText("Gender : ");
+        jLabel9.setText("Select Patient :");
+
+        txtSearchPatient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchPatientActionPerformed(evt);
+            }
+        });
+
+        btnSelectPatient.setText("Select Patient");
+        btnSelectPatient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectPatientActionPerformed(evt);
+            }
+        });
+
+        btnSearchPatient.setText("Search");
+        btnSearchPatient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchPatientActionPerformed(evt);
+            }
+        });
+
+        tblPatient.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "ID", "Patient Name", "Phone Number"
+            }
+        ));
+        jScrollPane1.setViewportView(tblPatient);
+
+        btnAddPatient.setText("Add New Patient");
+        btnAddPatient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddPatientActionPerformed(evt);
+            }
+        });
+
+        jLabel14.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel14.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel14.setText("Available Time :");
+
+        jLabel13.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel13.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel13.setText("Date :");
+
+        jLabel12.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel12.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel12.setText("Treatment :");
+
+        jLabel11.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel11.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel11.setText("Patient ID :");
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("APPOINTMENT DETAILS");
+
+        jLabel15.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel15.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel15.setText("Notes :");
+
+        cmbDentist.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Dentist" }));
+        cmbDentist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbDentistActionPerformed(evt);
+            }
+        });
+
+        cmbTreatment.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Treatment" }));
 
         cmbYear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -232,19 +718,103 @@ public AppoinmentManagementForm() {
             }
         });
 
-        cmbGender.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Gender", "Male", "Female" }));
-
-        btnRegister.setText("Register");
-        btnRegister.addActionListener(new java.awt.event.ActionListener() {
+        cmbMonth.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRegisterActionPerformed(evt);
+                cmbMonthActionPerformed(evt);
             }
         });
 
-        btnSearch.setText("Search");
-        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+        cmbDay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchActionPerformed(evt);
+                cmbDayActionPerformed(evt);
+            }
+        });
+
+        jLabel16.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel16.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel16.setText("Dentist :");
+
+        txtPatientId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPatientIdActionPerformed(evt);
+            }
+        });
+
+        jLabel17.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel17.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel17.setText("Patient Name :");
+
+        jLabel18.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel18.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel18.setText("Phone :");
+
+        cmbTime.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Time" }));
+
+        btnAdd.setText("Add");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+
+        btnUpdate.setText("Update");
+        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateActionPerformed(evt);
+            }
+        });
+
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+
+        btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
+        tblAppoinment.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Appoinment No", "Patient", "Dentist", "Treatment", "Date", "Time"
+            }
+        ));
+        tblAppoinment.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblAppoinmentMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(tblAppoinment);
+
+        jLabel6.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel6.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel6.setText("Appoinment No:");
+
+        btnSearchAppoinment.setText("Search");
+        btnSearchAppoinment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchAppoinmentActionPerformed(evt);
+            }
+        });
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
             }
         });
 
@@ -255,92 +825,177 @@ public AppoinmentManagementForm() {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(43, 43, 43)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(38, 38, 38)
+                        .addGap(88, 88, 88)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
-                                    .addComponent(txtFullName))
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(43, 43, 43)
-                                .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPhoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cmbDentist, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(txtPatientName, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtPatientId, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(254, 254, 254)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(64, 64, 64)
+                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                                .addComponent(cmbYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(btnSearchPatient, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                                        .addComponent(cmbMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(cmbDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                .addComponent(cmbTime, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(cmbTreatment, javax.swing.GroupLayout.Alignment.LEADING, 0, 143, Short.MAX_VALUE))))
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(64, 64, 64)
+                                        .addComponent(txtNote))))
                             .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(cmbYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(cmbGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(13, 13, 13)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(173, 173, 173)
-                        .addComponent(btnRegister, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(32, 54, Short.MAX_VALUE))
+                        .addGap(306, 306, 306)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSelectPatient, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(52, 52, 52)
+                                .addComponent(btnAddPatient))
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(21, 33, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(341, 341, 341)
+                .addComponent(btnAdd)
+                .addGap(32, 32, 32)
+                .addComponent(btnUpdate)
+                .addGap(27, 27, 27)
+                .addComponent(btnDelete)
+                .addGap(28, 28, 28)
+                .addComponent(btnClear)
+                .addGap(30, 30, 30)
+                .addComponent(btnBack)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 721, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(159, 159, 159))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(42, 42, 42)
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(31, 31, 31)
+                .addComponent(txtAppointmentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addComponent(btnSearchAppoinment, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34)
+                .addComponent(txtSearchPatient, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(230, 230, 230))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(37, 37, 37)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel5))
+                        .addComponent(txtSearchPatient, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSearchPatient))
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(txtAppointmentNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSearchAppoinment)))
+                .addGap(14, 14, 14)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(btnSelectPatient)
+                    .addComponent(btnAddPatient))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnSearch))
+                            .addComponent(jLabel11)
+                            .addComponent(txtPatientId, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addComponent(txtFullName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel6)
-                    .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel17)
+                            .addComponent(txtPatientName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel18)
+                            .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel16)
+                            .addComponent(cmbDentist, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cmbYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel13))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel14)
+                            .addComponent(cmbTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel12)
+                            .addComponent(cmbTreatment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel15)
+                            .addComponent(txtNote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtPhoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addGap(21, 21, 21)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(cmbYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnAdd)
+                    .addComponent(btnUpdate)
+                    .addComponent(btnDelete)
+                    .addComponent(btnClear)
+                    .addComponent(btnBack))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
-                .addGap(64, 64, 64)
-                .addComponent(btnRegister)
-                .addContainerGap(211, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(83, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 530, 630));
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 1080, 660));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -348,160 +1003,755 @@ public AppoinmentManagementForm() {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void cmbYearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbYearActionPerformed
+    private void btnSearchPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchPatientActionPerformed
+  String searchText = txtSearchPatient.getText().trim();
+
+    if (searchText.isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+                "Please enter Patient ID or Phone Number.");
+        return;
+    }
+
+    Patient patient =
+            patientController.searchPatientByIdOrPhone(searchText);
+
+    DefaultTableModel model =
+            (DefaultTableModel) tblPatient.getModel();
+
+    model.setRowCount(0);
+
+    if (patient == null) {
+        JOptionPane.showMessageDialog(this,
+                "Patient not found.");
+        return;
+    }
+
+    model.addRow(new Object[]{
+        patient.getPatientId(),
+        patient.getFullName(),
+        patient.getPhoneNumber()
+    });
+      
+    }//GEN-LAST:event_btnSearchPatientActionPerformed
+
+    private void btnSelectPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectPatientActionPerformed
+     int selectedRow =
+            tblPatient.getSelectedRow();
+
+    if (selectedRow == -1) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select a patient from the table."
+        );
+
+        return;
+    }
+
+    int patientId =
+            Integer.parseInt(
+                    tblPatient.getValueAt(
+                            selectedRow,
+                            0
+                    ).toString()
+            );
+
+   Patient 
+       patient = patientController.searchPatientByIdOrPhone(
+               String.valueOf(patientId)
+       );
+
+    if (patient == null) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Patient information could not be found."
+        );
+
+        return;
+    }
+
+    txtPatientId.setText(
+            String.valueOf(
+                    patient.getPatientId()
+            )
+    );
+
+    txtPatientName.setText(
+            patient.getFullName()
+    );
+
+    txtPhone.setText(
+            patient.getPhoneNumber()
+    );
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Patient selected successfully."
+    );
+    
+    }//GEN-LAST:event_btnSelectPatientActionPerformed
+
+    private void btnAddPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPatientActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_cmbYearActionPerformed
+    }//GEN-LAST:event_btnAddPatientActionPerformed
 
-    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-                                    
-
-    String fullName = txtFullName.getText().trim();
-    String address = txtAddress.getText().trim();
-    String phoneNumber = txtPhoneNumber.getText().trim();
-    String gender = cmbGender.getSelectedItem().toString();
-
-    // Check required fields
-    if (fullName.isEmpty() || address.isEmpty() || phoneNumber.isEmpty()) {
-        JOptionPane.showMessageDialog(this,
-            "Please fill in all required fields.");
+    private void cmbMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMonthActionPerformed
+        if (cmbYear.getSelectedItem() == null
+            || cmbMonth.getSelectedItem() == null) {
         return;
     }
 
-    // Validate patient name
-    if (!fullName.matches("[a-zA-Z ]+")) {
-        JOptionPane.showMessageDialog(this,
-            "Full name should contain only letters and spaces.");
+    if (cmbMonth.getSelectedIndex() == 0
+            || cmbYear.getSelectedIndex() == 0) {
         return;
     }
 
-    // Validate phone number
-    if (!phoneNumber.matches("^0\\d{9}$")) {
-        JOptionPane.showMessageDialog(this,
-            "Please enter a valid 10-digit phone number.");
-        return;
+    int year = Integer.parseInt(
+            cmbYear.getSelectedItem().toString()
+    );
+
+    int month = cmbMonth.getSelectedIndex();
+
+    int daysInMonth =
+            java.time.YearMonth.of(year, month)
+                    .lengthOfMonth();
+
+    cmbDay.removeAllItems();
+    cmbDay.addItem("Day");
+
+    for (int day = 1; day <= daysInMonth; day++) {
+
+        cmbDay.addItem(
+                String.format("%02d", day)
+        );
     }
 
-    // Validate gender
-    if (gender.equals("Select Gender")) {
-        JOptionPane.showMessageDialog(this,
-            "Please select a gender.");
-        return;
-    }
+    loadAvailableTimes();
+    }//GEN-LAST:event_cmbMonthActionPerformed
 
-    // Validate Date of Birth
-    if (cmbYear.getSelectedIndex() == 0
-        || cmbMonth.getSelectedIndex() == 0
-        || cmbDay.getSelectedIndex() == 0) {
+    
+    
+    private void txtPatientIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPatientIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPatientIdActionPerformed
 
-        JOptionPane.showMessageDialog(this,
-            "Please select a complete Date of Birth.");
+    private void cmbDentistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbDentistActionPerformed
+ loadAvailableTimes();
+    }//GEN-LAST:event_cmbDentistActionPerformed
+
+    private void btnSearchAppoinmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchAppoinmentActionPerformed
+       String appointmentNumber =
+            txtAppointmentNumber.getText().trim();
+
+    if (appointmentNumber.isEmpty()) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Please enter appointment number."
+        );
+
         return;
     }
 
     try {
 
+        Appointment appointment =
+                appointmentController.searchAppointment(
+                        appointmentNumber
+                );
+
+        if (appointment == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Appointment not found."
+            );
+
+            return;
+        }
+
+        // Display appointment information
+        loadAppointmentToForm(appointment);
+
+        // Select the appointment in the table
+        for (int i = 0; i < tblAppoinment.getRowCount(); i++) {
+
+            String tableAppointmentNumber =
+                    tblAppoinment.getValueAt(i, 1).toString();
+
+            if (tableAppointmentNumber.equals(
+                    appointmentNumber)) {
+
+                tblAppoinment.setRowSelectionInterval(i, i);
+                break;
+            }
+        }
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Error searching appointment: "
+                        + e.getMessage()
+        );
+    }
+    }//GEN-LAST:event_btnSearchAppoinmentActionPerformed
+
+    private void txtSearchPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchPatientActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchPatientActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+    clearFields();
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void cmbDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbDayActionPerformed
+ loadAvailableTimes();
+    }//GEN-LAST:event_cmbDayActionPerformed
+
+    private void cmbYearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbYearActionPerformed
+         loadAvailableTimes();
+    }//GEN-LAST:event_cmbYearActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+         // Validate patient
+    if (txtPatientId.getText().trim().isEmpty()) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select a patient."
+        );
+        return;
+    }
+
+    // Validate dentist
+    int dentistId = getSelectedDentistId();
+
+    if (dentistId == -1) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select a dentist."
+        );
+        return;
+    }
+
+    // Validate date
+    if (cmbYear.getSelectedIndex() == 0
+            || cmbMonth.getSelectedIndex() == 0
+            || cmbDay.getSelectedIndex() == 0) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select an appointment date."
+        );
+        return;
+    }
+
+    // Validate time
+    if (cmbTime.getSelectedIndex() == 0) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select an available time."
+        );
+        return;
+    }
+
+    // Validate treatment
+    if (cmbTreatment.getSelectedIndex() == 0) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select a treatment."
+        );
+        return;
+    }
+
+    try {
+
+        int patientId = Integer.parseInt(
+                txtPatientId.getText().trim()
+        );
+
         int year = Integer.parseInt(
-            cmbYear.getSelectedItem().toString()
+                cmbYear.getSelectedItem().toString()
         );
 
         int month = cmbMonth.getSelectedIndex();
 
         int day = Integer.parseInt(
-            cmbDay.getSelectedItem().toString()
+                cmbDay.getSelectedItem().toString()
         );
 
-        LocalDate dateOfBirth = LocalDate.of(year, month, day);
+        LocalDate appointmentDate =
+                LocalDate.of(year, month, day);
 
-        // Create Patient object
-        // Patient ID is 0 because MySQL AUTO_INCREMENT generates it
-        Patient patient = new Patient(
-            0,
-            fullName,
-            address,
-            phoneNumber,
-            dateOfBirth,
-            gender
+        LocalTime appointmentTime =
+                LocalTime.parse(
+                        cmbTime.getSelectedItem().toString()
+                );
+
+        int treatmentId =
+                getSelectedTreatmentId();
+
+        // Check again before saving
+        // to prevent double booking
+        if (appointmentController.isTimeSlotBooked(
+                dentistId,
+                appointmentDate,
+                appointmentTime)) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This time slot is already booked."
+            );
+
+            loadAvailableTimes();
+            return;
+        }
+
+        // Create appointment object
+        Appointment appointment =
+                new Appointment();
+
+        appointment.setAppointmentNumber(
+                appointmentController.generateAppointmentNumber()
         );
 
-        // Register patient
-        boolean registered = patientController.registerPatient(patient);
+        appointment.setPatientId(patientId);
+        appointment.setDentistId(dentistId);
+        appointment.setTreatmentId(treatmentId);
+        appointment.setAppointmentDate(appointmentDate);
+        appointment.setAppointmentTime(appointmentTime);
+        appointment.setNotes(txtNote.getText().trim());
 
-        if (registered) {
+        // Save appointment
+        boolean success =
+                appointmentController.addAppointment(
+                        appointment
+                );
 
-            JOptionPane.showMessageDialog(this,
-                "Patient registered successfully.");
+     if (success) {
 
-            // Clear the form after successful registration
+    JOptionPane.showMessageDialog(
+            this,
+            "Appointment registered successfully.\n"
+            + "Appointment Number: "
+            + appointment.getAppointmentNumber()
+    );
+
+    loadAppointments();
+    clearFields();
+}else {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to register appointment."
+            );
+        }
+
+    } catch (NumberFormatException e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Invalid patient information."
+        );
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Error: " + e.getMessage()
+        );
+    }
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        int selectedRow = tblAppoinment.getSelectedRow();
+
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select an appointment to update."
+        );
+        return;
+    }
+
+    try {
+
+        // Get the selected appointment number from the table
+        String appointmentNumber =
+                tblAppoinment.getValueAt(selectedRow, 1).toString();
+
+        // Find the existing appointment
+        Appointment appointment =
+                appointmentController.searchAppointment(
+                        appointmentNumber
+                );
+
+        if (appointment == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Appointment could not be found."
+            );
+            return;
+        }
+
+        // Validate patient
+        if (txtPatientId.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a patient."
+            );
+            return;
+        }
+
+        int patientId =
+                Integer.parseInt(txtPatientId.getText().trim());
+
+        // Validate dentist
+        int dentistId = getSelectedDentistId();
+
+        if (dentistId == -1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a dentist."
+            );
+            return;
+        }
+
+        // Validate date
+        if (cmbYear.getSelectedIndex() == 0
+                || cmbMonth.getSelectedIndex() == 0
+                || cmbDay.getSelectedIndex() == 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select appointment date."
+            );
+            return;
+        }
+
+        int year =
+                Integer.parseInt(
+                        cmbYear.getSelectedItem().toString()
+                );
+
+        int month =
+                cmbMonth.getSelectedIndex();
+
+        int day =
+                Integer.parseInt(
+                        cmbDay.getSelectedItem().toString()
+                );
+
+        LocalDate appointmentDate =
+                LocalDate.of(year, month, day);
+
+        // Validate time
+        if (cmbTime.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select appointment time."
+            );
+            return;
+        }
+
+        LocalTime appointmentTime =
+                LocalTime.parse(
+                        cmbTime.getSelectedItem().toString()
+                );
+
+        // Validate treatment
+        if (cmbTreatment.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select treatment."
+            );
+            return;
+        }
+
+        int treatmentId = getSelectedTreatmentId();
+
+        // Check whether another appointment already uses this slot
+        if (isTimeSlotBookedByAnotherAppointment(
+                dentistId,
+                appointmentDate,
+                appointmentTime,
+                appointment.getAppointmentId())) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This time slot is already booked."
+            );
+
+            loadAvailableTimes();
+            return;
+        }
+
+        // Update appointment details
+        appointment.setPatientId(patientId);
+        appointment.setDentistId(dentistId);
+        appointment.setTreatmentId(treatmentId);
+        appointment.setAppointmentDate(appointmentDate);
+        appointment.setAppointmentTime(appointmentTime);
+        appointment.setNotes(txtNote.getText().trim());
+
+        // Update database
+        boolean success =
+                appointmentController.updateAppointment(
+                        appointment
+                );
+
+        if (success) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Appointment updated successfully."
+            );
+
+            loadAppointments();
             clearFields();
 
         } else {
 
-            JOptionPane.showMessageDialog(this,
-                "Patient registration failed.");
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to update appointment."
+            );
+        }
+
+    } catch (NumberFormatException e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Invalid patient information."
+        );
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Error updating appointment: "
+                + e.getMessage()
+        );
+    }
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void tblAppoinmentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblAppoinmentMouseClicked
+        int selectedRow = tblAppoinment.getSelectedRow();
+
+    if (selectedRow == -1) {
+        return;
+    }
+
+    try {
+
+        // Get appointment number from selected row
+        String appointmentNumber =
+                tblAppoinment.getValueAt(selectedRow, 1).toString();
+
+        // Get complete appointment details
+        Appointment appointment =
+                appointmentController.searchAppointment(
+                        appointmentNumber
+                );
+
+        if (appointment == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Appointment information could not be found."
+            );
+            return;
+        }
+
+        // Load patient information
+        txtPatientId.setText(
+                String.valueOf(appointment.getPatientId())
+        );
+
+        txtPatientName.setText(
+                appointment.getPatientName()
+        );
+
+        Patient patient =
+                patientController.searchPatientByIdOrPhone(
+                        String.valueOf(appointment.getPatientId())
+                );
+
+        if (patient != null) {
+            txtPhone.setText(
+                    patient.getPhoneNumber()
+            );
+        }
+
+        // Select dentist
+        for (int i = 0; i < dentistList.size(); i++) {
+
+            if (dentistList.get(i).getDentistId()
+                    == appointment.getDentistId()) {
+
+                cmbDentist.setSelectedIndex(i + 1);
+                break;
+            }
+        }
+
+        // Select treatment by treatment name
+        cmbTreatment.setSelectedItem(
+                appointment.getTreatmentName()
+        );
+
+        // Load appointment date
+        LocalDate date =
+                appointment.getAppointmentDate();
+
+        cmbYear.setSelectedItem(
+                String.valueOf(date.getYear())
+        );
+
+        cmbMonth.setSelectedIndex(
+                date.getMonthValue()
+        );
+
+        cmbDay.setSelectedItem(
+                String.format(
+                        "%02d",
+                        date.getDayOfMonth()
+                )
+        );
+
+        // Load available times
+        loadAvailableTimes();
+
+        // Add the current appointment time
+        // because it is already booked
+        if (appointment.getAppointmentTime() != null) {
+
+            String appointmentTime =
+                    appointment.getAppointmentTime().toString();
+
+            boolean timeExists = false;
+
+            for (int i = 0; i < cmbTime.getItemCount(); i++) {
+
+                if (appointmentTime.equals(
+                        cmbTime.getItemAt(i))) {
+
+                    timeExists = true;
+                    break;
+                }
+            }
+
+            if (!timeExists) {
+                cmbTime.addItem(appointmentTime);
+            }
+
+            cmbTime.setSelectedItem(appointmentTime);
+        }
+
+        // Load notes
+        if (appointment.getNotes() != null) {
+            txtNote.setText(
+                    appointment.getNotes()
+            );
+        } else {
+            txtNote.setText("");
         }
 
     } catch (Exception e) {
 
-        JOptionPane.showMessageDialog(this,
-            "An error occurred: " + e.getMessage());
+        JOptionPane.showMessageDialog(
+                this,
+                "Error loading appointment: "
+                + e.getMessage()
+        );
+    }
+    }//GEN-LAST:event_tblAppoinmentMouseClicked
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+         int selectedRow = tblAppoinment.getSelectedRow();
+
+    // Check whether an appointment is selected
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select an appointment to delete."
+        );
+        return;
     }
 
+    try {
 
-    }//GEN-LAST:event_btnRegisterActionPerformed
+        // Get appointment ID from the selected table row
+        int appointmentId = Integer.parseInt(
+                tblAppoinment.getValueAt(selectedRow, 0).toString()
+        );
 
-    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        String appointmentNumber =
+                tblAppoinment.getValueAt(selectedRow, 1).toString();
 
-        // Get text from the search field (ID or Phone)
-        String searchText = txtSearch.getText().trim();
+        // Ask for confirmation before deleting
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete appointment "
+                        + appointmentNumber + "?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION
+        );
 
-        // Check if the search box is empty
-        if (searchText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter Patient ID or Phone Number");
+        if (confirm != JOptionPane.YES_OPTION) {
             return;
         }
 
-        try {
-            // Search using the new Controller method
-            Patient patient = patientController.searchPatientByIdOrPhone(searchText);
+        // Delete the appointment
+        boolean success =
+                appointmentController.deleteAppointment(appointmentId);
 
-            // Check whether the patient was found
-            if (patient == null) {
-                JOptionPane.showMessageDialog(this, "Patient not found! Please check the ID or Phone Number.");
-                return;
-            }
+        if (success) {
 
-            // Display patient information
-            txtFullName.setText(patient.getFullName());
-            txtAddress.setText(patient.getAddress());
-            txtPhoneNumber.setText(patient.getPhoneNumber());
-            cmbGender.setSelectedItem(patient.getGender());
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Appointment deleted successfully."
+            );
 
-            // Display Date of Birth
-            LocalDate dob = patient.getDateOfBirth();
-            if (dob != null) {
-                cmbYear.setSelectedItem(String.valueOf(dob.getYear()));
-                cmbDay.setSelectedItem(String.valueOf(dob.getDayOfMonth()));
-                cmbMonth.setSelectedIndex(dob.getMonthValue() - 1);
-            }
+            // Refresh the appointment table
+            loadAppointments();
 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "An error occurred: " + e.getMessage());
+            // Clear the form
+            clearFields();
+
+        } else {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to delete appointment."
+            );
         }
-    }//GEN-LAST:event_btnSearchActionPerformed
+
+    } catch (NumberFormatException e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Invalid appointment information."
+        );
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Error deleting appointment: "
+                        + e.getMessage()
+        );
+    }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+          AdminDashboardForm dashboard = new AdminDashboardForm();
+    dashboard.setVisible(true);
+    this.dispose();  
+    }//GEN-LAST:event_btnBackActionPerformed
 
     
-        private void clearFields() {
-
-        txtSearch.setText("");
-        txtFullName.setText("");
-        txtAddress.setText("");
-        txtPhoneNumber.setText("");
-        cmbGender.setSelectedIndex(0);
-        cmbYear.setSelectedIndex(0);
-        cmbMonth.setSelectedIndex(0);
-        cmbDay.setSelectedIndex(0);
-
-    }
+    
     /**
      * @param args the command line arguments
      */
@@ -538,33 +1788,50 @@ public AppoinmentManagementForm() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnRegister;
-    private javax.swing.JButton btnSearch;
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnAddPatient;
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnSearchAppoinment;
+    private javax.swing.JButton btnSearchPatient;
+    private javax.swing.JButton btnSelectPatient;
+    private javax.swing.JButton btnUpdate;
     private javax.swing.JComboBox<String> cmbDay;
-    private javax.swing.JComboBox<String> cmbGender;
+    private javax.swing.JComboBox<String> cmbDentist;
     private javax.swing.JComboBox<String> cmbMonth;
+    private javax.swing.JComboBox<String> cmbTime;
+    private javax.swing.JComboBox<String> cmbTreatment;
     private javax.swing.JComboBox<String> cmbYear;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JTextField txtAddress;
-    private javax.swing.JTextField txtFullName;
-    private javax.swing.JTextField txtPhoneNumber;
-    private javax.swing.JTextField txtSearch;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblAppoinment;
+    private javax.swing.JTable tblPatient;
+    private javax.swing.JTextField txtAppointmentNumber;
+    private javax.swing.JTextField txtNote;
+    private javax.swing.JTextField txtPatientId;
+    private javax.swing.JTextField txtPatientName;
+    private javax.swing.JTextField txtPhone;
+    private javax.swing.JTextField txtSearchPatient;
     // End of variables declaration//GEN-END:variables
 }

@@ -754,7 +754,9 @@ private void selectDentistUser(int userId) {
     }//GEN-LAST:event_cmbDentistUserActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        // TODO add your handling code here:
+       AdminDashboardForm dashboard = new AdminDashboardForm();
+    dashboard.setVisible(true);
+    this.dispose();  
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed

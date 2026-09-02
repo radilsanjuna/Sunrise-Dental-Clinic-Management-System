@@ -1,24 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.math.BigDecimal;
 
-
 public class Treatment {
-        private int treatmentId;
+
+    private int treatmentId;
     private String treatmentName;
-    private BigDecimal treatmentCost;
+    private String description;
+    private BigDecimal cost;
 
     public Treatment() {
     }
 
-    public Treatment(int treatmentId, String treatmentName, BigDecimal treatmentCost) {
+    public Treatment(int treatmentId, String treatmentName,
+                     String description, BigDecimal cost) {
+
         this.treatmentId = treatmentId;
         this.treatmentName = treatmentName;
-        this.treatmentCost = treatmentCost;
+        this.description = description;
+        this.cost = cost;
     }
 
     public int getTreatmentId() {
@@ -37,14 +37,19 @@ public class Treatment {
         this.treatmentName = treatmentName;
     }
 
-    public BigDecimal getTreatmentCost() {
-        return treatmentCost;
+    public String getDescription() {
+        return description;
     }
 
-    public void setTreatmentCost(BigDecimal treatmentCost) {
-        this.treatmentCost = treatmentCost;
+    public void setDescription(String description) {
+        this.description = description;
     }
-    
-    
-    
+
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
+    }
 }

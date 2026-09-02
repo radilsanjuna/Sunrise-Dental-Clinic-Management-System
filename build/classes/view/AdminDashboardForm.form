@@ -23,9 +23,10 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" pref="1154" max="32767" attributes="0"/>
+              <Component id="jPanel1" pref="1150" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -118,14 +119,15 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btnManageAppoinments" max="32767" attributes="0"/>
-                          <Component id="btnLogout" alignment="0" pref="188" max="32767" attributes="0"/>
-                          <Component id="btnViewreports" alignment="0" pref="188" max="32767" attributes="0"/>
-                          <Component id="btnBilling" alignment="0" pref="188" max="32767" attributes="0"/>
-                          <Component id="btnManagepatients" alignment="0" pref="188" max="32767" attributes="0"/>
-                          <Component id="btnManageUsers" alignment="0" pref="188" max="32767" attributes="0"/>
-                          <Component id="btnManagetreatments" alignment="0" pref="188" max="32767" attributes="0"/>
-                          <Component id="btnManageDentist" alignment="0" pref="188" max="32767" attributes="0"/>
+                          <Component id="btnManageAppoinmentsSchedule" max="32767" attributes="0"/>
+                          <Component id="btnLogout" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnViewreports" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnBilling" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnManagepatients" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnManageUsers" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnManagetreatments" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnManageDentist" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnManageAppoinments1" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -136,30 +138,35 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
                       <Component id="btnManagepatients" min="-2" pref="45" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                      <Component id="btnManageAppoinments1" min="-2" pref="45" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="btnManageAppoinments" min="-2" pref="45" max="-2" attributes="0"/>
+                      <Component id="btnManageAppoinmentsSchedule" min="-2" pref="45" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="btnManageDentist" min="-2" pref="45" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="btnManagetreatments" min="-2" pref="45" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="btnManageUsers" min="-2" pref="45" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnBilling" min="-2" pref="45" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                       <Component id="btnViewreports" min="-2" pref="45" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnLogout" min="-2" pref="45" max="-2" attributes="0"/>
-                      <EmptySpace pref="143" max="32767" attributes="0"/>
+                      <EmptySpace pref="76" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JButton" name="btnManageAppoinments">
+            <Component class="javax.swing.JButton" name="btnManageAppoinmentsSchedule">
               <Properties>
-                <Property name="text" type="java.lang.String" value=" Manage Appoinment"/>
+                <Property name="text" type="java.lang.String" value=" Manage Appoinment Schedule"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnManageAppoinmentsScheduleActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnManagepatients">
               <Properties>
@@ -199,11 +206,25 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Manage Treatments"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnManagetreatmentsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnManageDentist">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Manage Dentist"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnManageDentistActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnManageAppoinments1">
+              <Properties>
+                <Property name="text" type="java.lang.String" value=" Manage Appoinment"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnManageAppoinments1ActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
