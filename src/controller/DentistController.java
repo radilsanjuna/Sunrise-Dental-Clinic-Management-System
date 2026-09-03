@@ -32,4 +32,7 @@ public class DentistController {
     public List<Dentist> getAllDentists() {
         return dentistDAO.getAllDentists();
     }
+    public int getDentistIdByUserId(int userId) {
+    return dentistDAO.getDentistIdByUserId(userId);
+}
 }

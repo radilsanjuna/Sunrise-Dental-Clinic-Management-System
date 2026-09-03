@@ -44,46 +44,48 @@ public class PatientDAO {
     
     
     
-    //this section can search patient using id
-public Patient getPatientByIdOrPhone(String searchText) {
-    String sql = "SELECT * FROM patients WHERE patient_id = ? OR phone_number = ?";
+  public Patient getPatientByIdOrPhone(String searchText) {
+
+    String sql = "SELECT * FROM patients "
+            + "WHERE patient_id = ? "
+            + "OR phone_number = ? "
+            + "OR full_name LIKE ? "
+            + "LIMIT 1";
+
+    Patient patient = null;
 
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        int searchId = -1;
-        try {
-            searchId = Integer.parseInt(searchText);
-        } catch (NumberFormatException e) {
-            // It's not a valid integer (e.g., contains text or is too long), keep searchId as -1
-        }
-
-        stmt.setInt(1, searchId);
+        stmt.setString(1, searchText);
         stmt.setString(2, searchText);
+        stmt.setString(3, "%" + searchText + "%");
 
         try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                
-                // SAFE DATE HANDLING: Check if DOB is null in the database first
-                java.sql.Date sqlDate = rs.getDate("dob");
-                LocalDate dob = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-                return new Patient(
-                    rs.getInt("patient_id"),
-                    rs.getString("full_name"),
-                    rs.getString("address"),
-                    rs.getString("phone_number"),
-                    dob, // Use the safely checked date variable here
-                    rs.getString("gender")
-                );
+            if (rs.next()) {
+
+                patient = new Patient();
+
+                patient.setPatientId(rs.getInt("patient_id"));
+                patient.setFullName(rs.getString("full_name"));
+                patient.setAddress(rs.getString("address"));
+                patient.setPhoneNumber(rs.getString("phone_number"));
+
+                if (rs.getDate("dob") != null) {
+                    patient.setDateOfBirth(rs.getDate("dob").toLocalDate());
+                }
+
+                patient.setGender(rs.getString("gender"));
             }
         }
+
     } catch (SQLException e) {
         System.out.println("Error searching patient: " + e.getMessage());
     }
-    return null;
-}
 
+    return patient;
+}
    
     
     public boolean updatePatient(Patient patient) {

@@ -182,4 +182,35 @@ public class DentistDAO {
 
         return dentistList;
     }
+    
+    public int getDentistIdByUserId(int userId) {
+
+    String sql =
+            "SELECT dentist_id "
+            + "FROM dentists "
+            + "WHERE user_id = ?";
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt =
+                 conn.prepareStatement(sql)) {
+
+        stmt.setInt(1, userId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("dentist_id");
+            }
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+                "Error finding dentist ID: "
+                + e.getMessage()
+        );
+    }
+
+    return -1;
+}
 }

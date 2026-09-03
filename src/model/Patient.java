@@ -19,24 +19,25 @@ private String phoneNumber;
 private LocalDate dateOfBirth;
 private String gender;
 
-    // Constructor for existing patient
-    public Patient(int patientId, String fullName, String address, String phoneNumber, LocalDate dateOfBirth, String gender) {
-        this.patientId = patientId;
-        this.fullName = fullName;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.dateOfBirth = dateOfBirth;
-        this.gender = gender;
-    }
+public Patient() {
+}
 
-    //constructor 2 for a new patient
-    public Patient(String fullName, String address, String phoneNumber, LocalDate dateOfBirth, String gender) {
-        this.fullName = fullName;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.dateOfBirth = dateOfBirth;
-        this.gender = gender;
-    }
+public Patient(int patientId, String fullName, String address, String phoneNumber, LocalDate dateOfBirth, String gender) {
+    this.patientId = patientId;
+    this.fullName = fullName;
+    this.address = address;
+    this.phoneNumber = phoneNumber;
+    this.dateOfBirth = dateOfBirth;
+    this.gender = gender;
+}
+
+public Patient(String fullName, String address, String phoneNumber, LocalDate dateOfBirth, String gender) {
+    this.fullName = fullName;
+    this.address = address;
+    this.phoneNumber = phoneNumber;
+    this.dateOfBirth = dateOfBirth;
+    this.gender = gender;
+}
 
     public int getPatientId() {
         return patientId;

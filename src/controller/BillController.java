@@ -5,6 +5,7 @@
 package controller;
 
 import dao.BillDAO;
+import java.math.BigDecimal;
 import model.Bill;
 
 import java.util.List;
@@ -41,4 +42,11 @@ public class BillController {
     public String generateBillNumber() {
         return billDAO.generateBillNumber();
     }
+    public BigDecimal calculateTotal(BigDecimal treatmentCost, BigDecimal consultationFee) {
+    if (treatmentCost == null || consultationFee == null) {
+        return BigDecimal.ZERO;
+    }
+
+    return treatmentCost.add(consultationFee);
+}
 }

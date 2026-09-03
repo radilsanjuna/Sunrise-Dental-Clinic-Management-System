@@ -6,6 +6,8 @@ import javax.swing.JOptionPane;
 import model.User;
 
 
+
+
 public class LoginForm extends javax.swing.JFrame {
 
   
@@ -118,23 +120,38 @@ public class LoginForm extends javax.swing.JFrame {
     if (user != null) {
         String role = user.getRole() != null ? user.getRole().trim() : "";
 
-        if (role.equalsIgnoreCase("ADMIN")) {
-            JOptionPane.showMessageDialog(this, "Login successful!");
-            new AdminDashboardForm().setVisible(true);
-            this.dispose();
-        } else if (role.equalsIgnoreCase("RECEPTIONIST")) {
-            JOptionPane.showMessageDialog(this, "Login successful!");
-            new ReceptionDashboardForm().setVisible(true);
-            this.dispose();
-        } else {
-            // Warn if the user's role in the database doesn't match expected values
-            JOptionPane.showMessageDialog(
-                this, 
-                "Login successful, but user role '" + user.getRole() + "' is unrecognized.", 
-                "Role Error", 
-                JOptionPane.ERROR_MESSAGE
-            );
-        }
+if (role.equalsIgnoreCase("ADMIN")) {
+
+    JOptionPane.showMessageDialog(this, "Login successful!");
+
+    new AdminDashboardForm(user).setVisible(true);
+    this.dispose();
+
+} else if (role.equalsIgnoreCase("RECEPTION")) {
+
+    JOptionPane.showMessageDialog(this, "Login successful!");
+
+    new ReceptionDashboardForm(user).setVisible(true);
+    this.dispose();
+
+} else if (role.equalsIgnoreCase("DENTIST")) {
+
+    JOptionPane.showMessageDialog(this, "Login successful!");
+
+    new DentistDashboardForm(user).setVisible(true);
+    this.dispose();
+
+} else {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Login successful, but user role '"
+            + user.getRole()
+            + "' is unrecognized.",
+            "Role Error",
+            JOptionPane.ERROR_MESSAGE
+    );
+}
     } else {
         JOptionPane.showMessageDialog(this, "Invalid username or password!");
     }

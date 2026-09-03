@@ -8,6 +8,7 @@ import controller.BillController;
 import controller.AppointmentController;
 import controller.PatientController;
 import controller.TreatmentController;
+import java.io.File;
 import model.Bill;
 import model.Appointment;
 import java.math.BigDecimal;
@@ -15,29 +16,56 @@ import java.time.LocalDate;
 import javax.swing.JOptionPane;
 import model.Patient;
 import model.Treatment;
-
+import model.User;
 
 public class BillingManagementForm extends javax.swing.JFrame {
 
-   private BillController billController;
-private AppointmentController appointmentController;
-private PatientController patientController;
-private TreatmentController treatmentController;
-
-
+    private BillController billController;
+    private AppointmentController appointmentController;
+    private PatientController patientController;
+    private TreatmentController treatmentController;
+    private User loggedInUser;
 
     public BillingManagementForm() {
-        initComponents();
-          // setSize(1160, 780);
-        setResizable(false); 
-        setLocationRelativeTo(null); 
-        
-     billController = new BillController();
-    appointmentController = new AppointmentController();
-    patientController = new PatientController();
-    treatmentController = new TreatmentController();
+        this(null);
     }
 
+    public BillingManagementForm(User user) {
+        initComponents();
+
+        loggedInUser = user;
+
+        setResizable(false);
+        setLocationRelativeTo(null);
+
+        billController = new BillController();
+        appointmentController = new AppointmentController();
+        patientController = new PatientController();
+        treatmentController = new TreatmentController();
+
+        txtPatientId.setEditable(false);
+        txtPatientName.setEditable(false);
+        txtPhone.setEditable(false);
+        txtDentist.setEditable(false);
+        txtTreatment.setEditable(false);
+        txtAppointmentDate.setEditable(false);
+        txtAppointmentTime.setEditable(false);
+        txtTreatmentCost.setEditable(false);
+        txtTotal.setEditable(false);
+    }
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -72,7 +100,7 @@ private TreatmentController treatmentController;
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         txtTreatmentCost = new javax.swing.JTextField();
-        jTextField1 = new javax.swing.JTextField();
+        txtConsultationFee = new javax.swing.JTextField();
         txtTotal = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
         btnGenarateBill = new javax.swing.JButton();
@@ -80,6 +108,7 @@ private TreatmentController treatmentController;
         btnClear = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
         cmbPaymentStatus = new javax.swing.JComboBox<>();
+        btnCalculateTotal = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -90,7 +119,7 @@ private TreatmentController treatmentController;
 
         jLabel1.setFont(new java.awt.Font("Segoe UI Light", 0, 25)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("AdminDashboardForm");
+        jLabel1.setText("Billing Management");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -192,12 +221,34 @@ private TreatmentController treatmentController;
         });
 
         btnPrintRecipt.setText("Print Recipt");
+        btnPrintRecipt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintReciptActionPerformed(evt);
+            }
+        });
 
         btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
 
         btnBack.setText("back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         cmbPaymentStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Status", "Paid", "Unpaid" }));
+
+        btnCalculateTotal.setText("Calculate ");
+        btnCalculateTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCalculateTotalActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -230,15 +281,18 @@ private TreatmentController treatmentController;
                                 .addComponent(btnSearchAppoinment, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(txtPatientId, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtPatientName, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(txtTotal, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtTreatmentCost, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtAppointmentTime, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtAppointmentDate, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtTreatment, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtDentist, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtPhone, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(txtTotal, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtConsultationFee, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtTreatmentCost, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtAppointmentTime, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtAppointmentDate, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtTreatment, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtDentist, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtPhone, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                                .addGap(33, 33, 33)
+                                .addComponent(btnCalculateTotal))
                             .addComponent(cmbPaymentStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(btnGenarateBill, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -293,11 +347,12 @@ private TreatmentController treatmentController;
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel19)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtConsultationFee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(25, 25, 25)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel20)
-                    .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCalculateTotal))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel21)
@@ -328,7 +383,7 @@ private TreatmentController treatmentController;
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(59, Short.MAX_VALUE))
+                .addContainerGap(58, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -350,315 +405,452 @@ private TreatmentController treatmentController;
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSearchAppoinmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchAppoinmentActionPerformed
-        String appointmentNumber =
-            txtAppointmentNumber.getText().trim();
+        String appointmentNumber
+                = txtAppointmentNumber.getText().trim();
 
-    if (appointmentNumber.isEmpty()) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Please enter appointment number."
-        );
-
-        return;
-    }
-
-    try {
-
-        Appointment appointment =
-                appointmentController.searchAppointment(
-                        appointmentNumber
-                );
-
-        if (appointment == null) {
+        if (appointmentNumber.isEmpty()) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Appointment not found."
+                    "Please enter appointment number."
             );
 
             return;
         }
 
-        // Display patient information
-        txtPatientId.setText(
-                String.valueOf(appointment.getPatientId())
-        );
+        try {
 
-        txtPatientName.setText(
-                appointment.getPatientName()
-        );
+            Appointment appointment
+                    = appointmentController.searchAppointment(
+                            appointmentNumber
+                    );
 
-        Patient patient =
-                patientController.searchPatientByIdOrPhone(
-                        String.valueOf(
-                                appointment.getPatientId()
-                        )
+            if (appointment == null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Appointment not found."
                 );
 
-        if (patient != null) {
+                return;
+            }
 
-            txtPhone.setText(
-                    patient.getPhoneNumber()
+            // Display patient information
+            txtPatientId.setText(
+                    String.valueOf(appointment.getPatientId())
             );
 
-        } else {
+            txtPatientName.setText(
+                    appointment.getPatientName()
+            );
 
-            txtPhone.setText("");
-        }
+            Patient patient
+                    = patientController.searchPatientByIdOrPhone(
+                            String.valueOf(
+                                    appointment.getPatientId()
+                            )
+                    );
 
-        // Display dentist
-        txtDentist.setText(
-                appointment.getDentistName()
-        );
+            if (patient != null) {
 
-        // Display treatment
-        txtTreatment.setText(
-                appointment.getTreatmentName()
-        );
-
-        // Display appointment date
-        txtAppointmentDate.setText(
-                appointment.getAppointmentDate().toString()
-        );
-
-        // Display appointment time
-        txtAppointmentTime.setText(
-                appointment.getAppointmentTime().toString()
-        );
-
-        // Get treatment cost
-        Treatment treatment =
-                treatmentController.searchTreatment(
-                        appointment.getTreatmentId()
+                txtPhone.setText(
+                        patient.getPhoneNumber()
                 );
 
-        if (treatment != null) {
+            } else {
 
-            txtTreatmentCost.setText(
-                    treatment.getCost().toString()
+                txtPhone.setText("");
+            }
+
+            // Display dentist
+            txtDentist.setText(
+                    appointment.getDentistName()
             );
 
-        } else {
+            // Display treatment
+            txtTreatment.setText(
+                    appointment.getTreatmentName()
+            );
 
-            txtTreatmentCost.setText("");
+            // Display appointment date
+            txtAppointmentDate.setText(
+                    appointment.getAppointmentDate().toString()
+            );
+
+            // Display appointment time
+            txtAppointmentTime.setText(
+                    appointment.getAppointmentTime().toString()
+            );
+
+            // Get treatment cost
+            Treatment treatment
+                    = treatmentController.searchTreatment(
+                            appointment.getTreatmentId()
+                    );
+
+            if (treatment != null) {
+
+                txtTreatmentCost.setText(
+                        treatment.getCost().toString()
+                );
+
+            } else {
+
+                txtTreatmentCost.setText("");
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Appointment found successfully."
+            );
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error searching appointment: "
+                    + e.getMessage()
+            );
         }
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Appointment found successfully."
-        );
-
-    } catch (Exception e) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Error searching appointment: "
-                        + e.getMessage()
-        );
-    }
     }//GEN-LAST:event_btnSearchAppoinmentActionPerformed
 
-    
-    
-    
-    
-    
+
     private void txtPatientIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPatientIdActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtPatientIdActionPerformed
 
     private void btnGenarateBillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenarateBillActionPerformed
-      String appointmentNumber =
-            txtAppointmentNumber.getText().trim();
+        String appointmentNumber
+                = txtAppointmentNumber.getText().trim();
 
-    if (appointmentNumber.isEmpty()) {
+        if (appointmentNumber.isEmpty()) {
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Please search for an appointment first."
-        );
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please search for an appointment first."
+            );
 
+            return;
+        }
+
+        if (txtPatientId.getText().trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please search for a valid appointment."
+            );
+
+            return;
+        }
+
+        if (txtTreatmentCost.getText().trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Treatment cost is not available."
+            );
+
+            return;
+        }
+
+        if (txtConsultationFee.getText().trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter consultation fee."
+            );
+
+            return;
+        }
+        if (txtTotal.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please calculate the total before generating the bill."
+            );
+            return;
+        }
+
+        if (cmbPaymentStatus.getSelectedIndex() == 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select payment status."
+            );
+
+            return;
+        }
+
+        try {
+
+            // Get appointment
+            Appointment appointment
+                    = appointmentController.searchAppointment(
+                            appointmentNumber
+                    );
+
+            if (appointment == null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Appointment not found."
+                );
+
+                return;
+            }
+
+            // Check whether this appointment already has a bill
+            Bill existingBill
+                    = billController.getBillByAppointmentId(
+                            appointment.getAppointmentId()
+                    );
+
+            if (existingBill != null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "This appointment already has a bill.\n"
+                        + "Bill Number: "
+                        + existingBill.getBillNumber()
+                );
+
+                return;
+            }
+
+            // Get treatment cost
+BigDecimal consultationFee
+                    = new BigDecimal(txtConsultationFee.getText().trim());
+
+            if (consultationFee.compareTo(BigDecimal.ZERO) < 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Consultation fee cannot be negative."
+                );
+                return;
+            }
+
+            if (txtTotal.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Please calculate the total before generating the bill."
+                );
+                return;
+            }
+
+            BigDecimal totalAmount
+                    = new BigDecimal(txtTotal.getText().trim());
+
+            // Generate bill number
+            String billNumber
+                    = billController.generateBillNumber();
+
+            if (billNumber == null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Could not generate bill number."
+                );
+
+                return;
+            }
+
+            // Create bill
+            Bill bill = new Bill();
+
+            bill.setBillNumber(billNumber);
+            bill.setAppointmentId(
+                    appointment.getAppointmentId()
+            );
+            bill.setConsultationFee(
+                    consultationFee
+            );
+            bill.setTotalAmount(
+                    totalAmount
+            );
+            bill.setPaymentStatus(
+                    cmbPaymentStatus.getSelectedItem().toString()
+            );
+            bill.setBillDate(
+                    LocalDate.now()
+            );
+
+            // Save bill
+            boolean success
+                    = billController.addBill(bill);
+
+            if (success) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Bill generated successfully.\n"
+                        + "Bill Number: "
+                        + billNumber
+                );
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Failed to generate bill."
+                );
+            }
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter a valid consultation fee."
+            );
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error generating bill: "
+                    + e.getMessage()
+            );
+        }
+    }//GEN-LAST:event_btnGenarateBillActionPerformed
+
+    private void btnPrintReciptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintReciptActionPerformed
+        String appointmentNumber
+                = txtAppointmentNumber.getText().trim();
+
+        if (appointmentNumber.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please search for an appointment first."
+            );
+
+            return;
+        }
+
+        try {
+
+            // Find appointment
+            Appointment appointment
+                    = appointmentController.searchAppointment(
+                            appointmentNumber
+                    );
+
+            if (appointment == null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Appointment not found."
+                );
+
+                return;
+            }
+
+            // Find the bill
+            Bill bill
+                    = billController.getBillByAppointmentId(
+                            appointment.getAppointmentId()
+                    );
+
+            if (bill == null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Please generate the bill first."
+                );
+
+                return;
+            }
+
+            // Generate PDF
+            File pdfFile
+                    = util.ReceiptPDF.generateReceipt(bill);
+
+            // Open PDF
+            java.awt.Desktop.getDesktop().open(pdfFile);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Receipt generated successfully."
+            );
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error generating receipt: "
+                    + e.getMessage()
+            );
+        }
+    }//GEN-LAST:event_btnPrintReciptActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+         if (loggedInUser != null
+            && loggedInUser.getRole().equalsIgnoreCase("Admin")) {
+
+        new AdminDashboardForm(loggedInUser).setVisible(true);
+
+    } else if (loggedInUser != null
+            && loggedInUser.getRole().equalsIgnoreCase("Reception")) {
+
+        new ReceptionDashboardForm(loggedInUser).setVisible(true);
+
+    } else {
+        new AdminDashboardForm().setVisible(true);
+    }
+
+    this.dispose();
+    }//GEN-LAST:event_btnBackActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        txtAppointmentNumber.setText("");
+    txtPatientId.setText("");
+    txtPatientName.setText("");
+    txtPhone.setText("");
+    txtDentist.setText("");
+    txtTreatment.setText("");
+    txtAppointmentDate.setText("");
+    txtAppointmentTime.setText("");
+    txtTreatmentCost.setText("");
+    txtConsultationFee.setText("");
+    txtTotal.setText("");
+    cmbPaymentStatus.setSelectedIndex(0);
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void btnCalculateTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalculateTotalActionPerformed
+         String treatmentCostText = txtTreatmentCost.getText().trim();
+    String consultationFeeText = txtConsultationFee.getText().trim();
+
+    if (treatmentCostText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please search an appointment first.");
         return;
     }
 
-    if (txtPatientId.getText().trim().isEmpty()) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Please search for a valid appointment."
-        );
-
-        return;
-    }
-
-    if (txtTreatmentCost.getText().trim().isEmpty()) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Treatment cost is not available."
-        );
-
-        return;
-    }
-
-    if (jTextField1.getText().trim().isEmpty()) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Please enter consultation fee."
-        );
-
-        return;
-    }
-
-    if (cmbPaymentStatus.getSelectedIndex() == 0) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Please select payment status."
-        );
-
+    if (consultationFeeText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter consultation fee.");
         return;
     }
 
     try {
-
-        // Get appointment
-        Appointment appointment =
-                appointmentController.searchAppointment(
-                        appointmentNumber
-                );
-
-        if (appointment == null) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Appointment not found."
-            );
-
-            return;
-        }
-
-        // Check whether this appointment already has a bill
-        Bill existingBill =
-                billController.getBillByAppointmentId(
-                        appointment.getAppointmentId()
-                );
-
-        if (existingBill != null) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "This appointment already has a bill.\n"
-                    + "Bill Number: "
-                    + existingBill.getBillNumber()
-            );
-
-            return;
-        }
-
-        // Get treatment cost
-        BigDecimal treatmentCost =
-                new BigDecimal(
-                        txtTreatmentCost.getText().trim()
-                );
-
-        // Get consultation fee
-        BigDecimal consultationFee =
-                new BigDecimal(
-                        jTextField1.getText().trim()
-                );
+        BigDecimal treatmentCost = new BigDecimal(treatmentCostText);
+        BigDecimal consultationFee = new BigDecimal(consultationFeeText);
 
         if (consultationFee.compareTo(BigDecimal.ZERO) < 0) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Consultation fee cannot be negative."
-            );
-
+            JOptionPane.showMessageDialog(this, "Consultation fee cannot be negative.");
             return;
         }
 
-        // Calculate total
-        BigDecimal totalAmount =
-                treatmentCost.add(consultationFee);
-
-        txtTotal.setText(
-                totalAmount.toString()
-        );
-
-        // Generate bill number
-        String billNumber =
-                billController.generateBillNumber();
-
-        if (billNumber == null) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Could not generate bill number."
-            );
-
-            return;
-        }
-
-        // Create bill
-        Bill bill = new Bill();
-
-        bill.setBillNumber(billNumber);
-        bill.setAppointmentId(
-                appointment.getAppointmentId()
-        );
-        bill.setConsultationFee(
+        BigDecimal totalAmount = billController.calculateTotal(
+                treatmentCost,
                 consultationFee
         );
-        bill.setTotalAmount(
-                totalAmount
-        );
-        bill.setPaymentStatus(
-                cmbPaymentStatus.getSelectedItem().toString()
-        );
-        bill.setBillDate(
-                LocalDate.now()
-        );
 
-        // Save bill
-        boolean success =
-                billController.addBill(bill);
-
-        if (success) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Bill generated successfully.\n"
-                    + "Bill Number: "
-                    + billNumber
-            );
-
-        } else {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to generate bill."
-            );
-        }
+        txtTotal.setText(totalAmount.toString());
 
     } catch (NumberFormatException e) {
-
         JOptionPane.showMessageDialog(
                 this,
                 "Please enter a valid consultation fee."
         );
-
-    } catch (Exception e) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Error generating bill: "
-                        + e.getMessage()
-        );
     }
-    }//GEN-LAST:event_btnGenarateBillActionPerformed
+    }//GEN-LAST:event_btnCalculateTotalActionPerformed
 
     /**
      * @param args the command line arguments
@@ -697,6 +889,7 @@ private TreatmentController treatmentController;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnCalculateTotal;
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnGenarateBill;
     private javax.swing.JButton btnPrintRecipt;
@@ -718,10 +911,10 @@ private TreatmentController treatmentController;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField txtAppointmentDate;
     private javax.swing.JTextField txtAppointmentNumber;
     private javax.swing.JTextField txtAppointmentTime;
+    private javax.swing.JTextField txtConsultationFee;
     private javax.swing.JTextField txtDentist;
     private javax.swing.JTextField txtPatientId;
     private javax.swing.JTextField txtPatientName;

@@ -20,7 +20,7 @@ import model.DentistSchedule;
 import java.time.LocalTime;
 
 import model.Appointment;
-
+import model.User;
 /**
  *
  * @author Radil_Sanjuna
@@ -35,31 +35,34 @@ public class AppoinmentManagementForm extends javax.swing.JFrame {
     private List<Patient> patientList;
     private List<Dentist> dentistList;
     private List<Treatment> treatmentList;
+    private User loggedInUser;
     
 public AppoinmentManagementForm() {
-  initComponents();
+    this(null);
+}
 
-    // Initialize controllers after GUI components are created
+public AppoinmentManagementForm(User user) {
+    initComponents();
+
+    loggedInUser = user;
+
     patientController = new PatientController();
-dentistController = new DentistController();
-treatmentController = new TreatmentController();
-scheduleController = new DentistScheduleController();
-appointmentController = new AppointmentController();
+    dentistController = new DentistController();
+    treatmentController = new TreatmentController();
+    scheduleController = new DentistScheduleController();
+    appointmentController = new AppointmentController();
+
     setupDateOfBirth();
 
-    // Set form properties
     setSize(1160, 780);
     setResizable(false);
     setLocationRelativeTo(null);
 
-    // Load initial patient data
     loadPatients();
-      loadDentists();
-      loadTreatments();
-      loadAppointments();
-    
+    loadDentists();
+    loadTreatments();
+    loadAppointments();
 }
-
     
 
 
@@ -960,7 +963,7 @@ private void clearFields() {
                             .addComponent(cmbDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel13))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel14)
                             .addComponent(cmbTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
@@ -1093,7 +1096,9 @@ private void clearFields() {
     }//GEN-LAST:event_btnSelectPatientActionPerformed
 
     private void btnAddPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPatientActionPerformed
-        // TODO add your handling code here:
+          PatientManagmentForm patientForm = new PatientManagmentForm(loggedInUser, true);
+    patientForm.setVisible(true);
+    this.dispose();
     }//GEN-LAST:event_btnAddPatientActionPerformed
 
     private void cmbMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMonthActionPerformed
@@ -1745,9 +1750,15 @@ private void clearFields() {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-          AdminDashboardForm dashboard = new AdminDashboardForm();
-    dashboard.setVisible(true);
-    this.dispose();  
+        if (loggedInUser != null && loggedInUser.getRole().equalsIgnoreCase("Admin")) {
+        new AdminDashboardForm(loggedInUser).setVisible(true);
+    } else if (loggedInUser != null && loggedInUser.getRole().equalsIgnoreCase("Reception")) {
+        new ReceptionDashboardForm(loggedInUser).setVisible(true);
+    } else {
+        new AdminDashboardForm().setVisible(true);
+    }
+
+    this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
     

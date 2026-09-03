@@ -4,7 +4,7 @@
  */
 package view;
 import javax.swing.JOptionPane;
-
+import model.User;
 
 /**
  *
@@ -12,12 +12,16 @@ import javax.swing.JOptionPane;
  */
 public class ReceptionDashboardForm extends javax.swing.JFrame {
 
-    /**
-     * Creates new form ReceptionDashboardForm
-     */
-    public ReceptionDashboardForm() {
-        initComponents();
-    }
+   private User loggedInUser;
+   
+   public ReceptionDashboardForm() {
+    this(null);
+}
+ public ReceptionDashboardForm(User user) {
+    initComponents();
+
+    loggedInUser = user;
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -36,6 +40,8 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
         btnCreatappoinment = new javax.swing.JButton();
         btnManageappoinment = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
+        btnLogout1 = new javax.swing.JButton();
+        btnLogout3 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -46,20 +52,54 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
 
         jPanel3.setBackground(new java.awt.Color(102, 204, 255));
 
-        btnManagepatients.setText(" Manage Patients");
+        btnManagepatients.setText("Appoinment Management");
+        btnManagepatients.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnManagepatientsActionPerformed(evt);
+            }
+        });
 
-        btnRegisterpatient.setText("Register Patient");
+        btnRegisterpatient.setText("Patient Management");
+        btnRegisterpatient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterpatientActionPerformed(evt);
+            }
+        });
 
-        btnBilling.setText("Billing ");
+        btnBilling.setText("View Bill");
 
-        btnCreatappoinment.setText("Create Appointment");
+        btnCreatappoinment.setText("Dentist Schedule");
+        btnCreatappoinment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreatappoinmentActionPerformed(evt);
+            }
+        });
 
-        btnManageappoinment.setText("Manage Appointments");
+        btnManageappoinment.setText("Generate Bill");
+        btnManageappoinment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnManageappoinmentActionPerformed(evt);
+            }
+        });
 
-        btnLogout.setText("Logout");
+        btnLogout.setText("Print Recipt");
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLogoutActionPerformed(evt);
+            }
+        });
+
+        btnLogout1.setText("Help");
+        btnLogout1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogout1ActionPerformed(evt);
+            }
+        });
+
+        btnLogout3.setText("Logout");
+        btnLogout3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogout3ActionPerformed(evt);
             }
         });
 
@@ -74,7 +114,9 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
                     .addComponent(btnBilling, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnManageappoinment, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                     .addComponent(btnCreatappoinment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnLogout1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnLogout3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel3Layout.createSequentialGroup()
@@ -95,7 +137,11 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
                 .addComponent(btnBilling, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(257, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnLogout1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(btnLogout3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(143, Short.MAX_VALUE))
             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel3Layout.createSequentialGroup()
                     .addGap(82, 82, 82)
@@ -114,7 +160,7 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(385, Short.MAX_VALUE)
+                .addContainerGap(495, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 381, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(264, 264, 264))
         );
@@ -130,30 +176,26 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1030, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGap(10, 10, 10)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 760, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(0, 5, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(10, 10, 10)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 5, Short.MAX_VALUE)))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(13, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1030, 760));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1160, 780));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -173,6 +215,39 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
         this.dispose();
     }
     }//GEN-LAST:event_btnLogoutActionPerformed
+
+    private void btnLogout1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogout1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLogout1ActionPerformed
+
+    private void btnLogout3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogout3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLogout3ActionPerformed
+
+    private void btnRegisterpatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterpatientActionPerformed
+        PatientManagmentForm patientForm = new PatientManagmentForm(loggedInUser);
+    patientForm.setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_btnRegisterpatientActionPerformed
+
+    private void btnManagepatientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManagepatientsActionPerformed
+     AppoinmentManagementForm appointmentForm = new AppoinmentManagementForm(loggedInUser);
+    appointmentForm.setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_btnManagepatientsActionPerformed
+
+    private void btnCreatappoinmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreatappoinmentActionPerformed
+        ReceptionScheduleForm scheduleForm = new ReceptionScheduleForm(loggedInUser);
+
+        scheduleForm.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnCreatappoinmentActionPerformed
+
+    private void btnManageappoinmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageappoinmentActionPerformed
+        BillingManagementForm billingForm = new BillingManagementForm(loggedInUser);
+        billingForm.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnManageappoinmentActionPerformed
 
     /**
      * @param args the command line arguments
@@ -213,6 +288,8 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
     private javax.swing.JButton btnBilling;
     private javax.swing.JButton btnCreatappoinment;
     private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnLogout1;
+    private javax.swing.JButton btnLogout3;
     private javax.swing.JButton btnManageappoinment;
     private javax.swing.JButton btnManagepatients;
     private javax.swing.JButton btnRegisterpatient;

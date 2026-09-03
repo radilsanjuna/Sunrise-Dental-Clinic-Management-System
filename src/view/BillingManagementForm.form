@@ -67,7 +67,7 @@
                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="59" max="32767" attributes="0"/>
+                  <EmptySpace pref="58" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -109,7 +109,7 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="0" green="0" red="0" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="AdminDashboardForm"/>
+                <Property name="text" type="java.lang.String" value="Billing Management"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -155,15 +155,19 @@
                                   </Group>
                                   <Component id="txtPatientId" min="-2" pref="150" max="-2" attributes="0"/>
                                   <Component id="txtPatientName" min="-2" pref="150" max="-2" attributes="0"/>
-                                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                                      <Component id="txtTotal" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="jTextField1" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="txtTreatmentCost" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="txtAppointmentTime" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="txtAppointmentDate" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="txtTreatment" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="txtDentist" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="txtPhone" alignment="0" pref="150" max="32767" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                          <Component id="txtTotal" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtConsultationFee" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtTreatmentCost" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtAppointmentTime" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtAppointmentDate" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtTreatment" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtDentist" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtPhone" alignment="0" pref="150" max="32767" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                                      <Component id="btnCalculateTotal" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="cmbPaymentStatus" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -234,12 +238,13 @@
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel19" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtConsultationFee" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="txtTotal" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnCalculateTotal" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -442,7 +447,7 @@
             </Component>
             <Component class="javax.swing.JTextField" name="txtTreatmentCost">
             </Component>
-            <Component class="javax.swing.JTextField" name="jTextField1">
+            <Component class="javax.swing.JTextField" name="txtConsultationFee">
             </Component>
             <Component class="javax.swing.JTextField" name="txtTotal">
             </Component>
@@ -472,16 +477,25 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Print Recipt"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrintReciptActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnClear">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Clear"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnBack">
               <Properties>
                 <Property name="text" type="java.lang.String" value="back"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBackActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JComboBox" name="cmbPaymentStatus">
               <Properties>
@@ -496,6 +510,14 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnCalculateTotal">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Calculate "/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCalculateTotalActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

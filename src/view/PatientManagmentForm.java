@@ -6,29 +6,44 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.Patient;
-
+import model.User;
 /**
  *
  * @author Radil_Sanjuna
  */
 public class PatientManagmentForm extends javax.swing.JFrame {
 
-    private PatientController patientController;
+ private PatientController patientController;
+private User loggedInUser;
+private boolean returnToAppointment;
 
-    public PatientManagmentForm() {
-        initComponents();
+public PatientManagmentForm() {
+    this(null, false);
+}
 
-        // 1. You MUST initialize the controller before using it
-        patientController = new PatientController();
+public PatientManagmentForm(User user) {
+    this(user, false);
+}
 
-        setupDateOfBirth();
-        setSize(1160, 780);
-        setResizable(false);
-        setLocationRelativeTo(null);
+public PatientManagmentForm(User user, boolean returnToAppointment) {
+    initComponents();
 
-        // 2. Call the method to load the table when the form opens
-        loadPatientsToTable();
+    patientController = new PatientController();
+    loggedInUser = user;
+    this.returnToAppointment = returnToAppointment;
+
+    setupDateOfBirth();
+    setSize(1160, 780);
+    setResizable(false);
+    setLocationRelativeTo(null);
+
+    if (loggedInUser != null && loggedInUser.getRole().equalsIgnoreCase("Reception")) {
+        btnDelete.setVisible(false);
     }
+
+    loadPatientsToTable();
+}
+
 
     private void loadPatientsToTable() {
         // 1. Get the existing model from your JTable
@@ -613,8 +628,21 @@ public class PatientManagmentForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-AdminDashboardForm dashboard = new AdminDashboardForm();
-    dashboard.setVisible(true);
+  if (returnToAppointment) {
+        new AppoinmentManagementForm(loggedInUser).setVisible(true);
+        this.dispose();
+        return;
+    }
+
+    if (loggedInUser != null && loggedInUser.getRole().equalsIgnoreCase("Admin")) {
+        new AdminDashboardForm(loggedInUser).setVisible(true);
+    } else if (loggedInUser != null && loggedInUser.getRole().equalsIgnoreCase("Reception")) {
+        new ReceptionDashboardForm(loggedInUser).setVisible(true);
+    } else {
+        new AdminDashboardForm().setVisible(true);
+    }
+
+    
     this.dispose();    }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
@@ -705,7 +733,7 @@ AdminDashboardForm dashboard = new AdminDashboardForm();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PatientManagmentForm().setVisible(true);
+                new PatientManagmentForm(null).setVisible(true);
             }
         });
     }
@@ -741,3 +769,4 @@ AdminDashboardForm dashboard = new AdminDashboardForm();
     private javax.swing.JTextField txtPhoneNumber;
     // End of variables declaration//GEN-END:variables
 }
+

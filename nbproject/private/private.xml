@@ -4,12 +4,43 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/model/Appointment.java</file>
-            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/AppointmentDAO.java</file>
-            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/model/User.java</file>
-            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/model/Dentist.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/RevenueReportDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/BillController.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/DentistAppointmentController.java</file>
             <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/model/Treatment.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/ViewBillingForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/LoginForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/RevenueReportForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/ReceptionDashboardForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/DentistDashboardForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/DentistController.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/RevenueReportController.java</file>
             <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/AppointmentController.java</file>
             <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/AppoinmentManagementForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/AppointmentDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/DentistAppointmentForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/DashboardDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/UserController.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/DentistDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/model/Bill.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/UserManagementForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/model/DentistSchedule.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/TreatmentManagementForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/DentistManagementForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/PatientManagmentForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/PatientController.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/TreatmentController.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/model/DentistItem.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/DentistScheduleDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/ScheduleManagementForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/BillDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/DashboardController.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/UserDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/dao/DentistAppointmentDAO.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/controller/DentistScheduleController.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/util/ReceiptPDF.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/AdminDashboardForm.java</file>
+            <file>file:/C:/Users/Radil_Sanjuna/OneDrive/Documents/NetBeansProjects/Sunrise_Dental_Clinic/src/view/BillingManagementForm.java</file>
         </group>
     </open-files>
 </project-private>
