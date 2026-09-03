@@ -5,10 +5,13 @@
 package view;
 
 
+
 import controller.BillController;
 import model.Bill;
+import model.User;
+import java.util.List;
 import javax.swing.JOptionPane;
-
+import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import util.ReceiptPDF;
 /**
@@ -17,29 +20,88 @@ import util.ReceiptPDF;
  */
 public class ViewBillingForm extends javax.swing.JFrame {
 
-    private BillController billController;
-    
-    public ViewBillingForm() {
-        initComponents();
-        setSize(1160, 780);
-        setResizable(false);
-        setLocationRelativeTo(null);
+   private BillController billController;
+private User loggedInUser;
 
-        billController = new BillController();
 
-        txtAppointmentNumber.setEditable(false);
-        txtPatientName.setEditable(false);
-        txtPhone.setEditable(false);
-        txtDentist.setEditable(false);
-        txtTreatment.setEditable(false);
-        txtAppointmentDate.setEditable(false);
-        txtAppointmentTime.setEditable(false);
-        txtTreatmentCost.setEditable(false);
-        txtConsultationFee.setEditable(false);
-        txtTotal.setEditable(false);
-        txtPaymentStatus.setEditable(false);
-        txtBillDate.setEditable(false);
+public ViewBillingForm() {
+    this(null);
+}
+
+public ViewBillingForm(User user) {
+    initComponents();
+
+    setSize(1160, 780);
+    setResizable(false);
+    setLocationRelativeTo(null);
+
+    loggedInUser = user;
+    billController = new BillController();
+
+    setupBillTable();
+    loadAllBills();
+}
+
+
+
+
+
+private void setupBillTable() {
+    DefaultTableModel model = new DefaultTableModel(
+            new Object[][]{},
+            new String[]{
+                "Bill No",
+                "Appointment",
+                "Patient",
+                "Treatment",
+                "Cost",
+                "Consult",
+                "Total",
+                "Payment Status",
+                "Bill Date"
+            }
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+
+    tblViewBill.setModel(model);
+    tblViewBill.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+}
+
+
+
+
+private void loadAllBills() {
+    List<Bill> bills = billController.getAllBills();
+    displayBills(bills);
+}
+
+
+private void displayBills(List<Bill> bills) {
+    DefaultTableModel model = (DefaultTableModel) tblViewBill.getModel();
+
+    model.setRowCount(0);
+
+    for (Bill bill : bills) {
+        model.addRow(new Object[]{
+            bill.getBillNumber(),
+            bill.getAppointmentNumber(),
+            bill.getPatientName(),
+            bill.getTreatmentName(),
+            bill.getTreatmentCost(),
+            bill.getConsultationFee(),
+            bill.getTotalAmount(),
+            bill.getPaymentStatus(),
+            bill.getBillDate()
+        });
     }
+}
+
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -55,35 +117,14 @@ public class ViewBillingForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        txtBillNumber = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
-        txtAppointmentNumber = new javax.swing.JTextField();
-        txtPatientName = new javax.swing.JTextField();
-        txtPhone = new javax.swing.JTextField();
-        txtDentist = new javax.swing.JTextField();
-        txtTreatment = new javax.swing.JTextField();
-        txtAppointmentDate = new javax.swing.JTextField();
-        txtAppointmentTime = new javax.swing.JTextField();
-        txtTreatmentCost = new javax.swing.JTextField();
-        txtConsultationFee = new javax.swing.JTextField();
-        txtTotal = new javax.swing.JTextField();
-        txtPaymentStatus = new javax.swing.JTextField();
         btnPrintRecipt = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
-        jLabel22 = new javax.swing.JLabel();
-        txtBillDate = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblViewBill = new javax.swing.JTable();
+        txtSearch = new javax.swing.JTextField();
+        btnViewAll = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -119,75 +160,8 @@ public class ViewBillingForm extends javax.swing.JFrame {
         jLabel6.setBackground(new java.awt.Color(0, 0, 0));
         jLabel6.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("Bill Number :");
-        jPanel3.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 6, 138, -1));
-
-        jLabel17.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel17.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel17.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel17.setText("Patient Name :");
-        jPanel3.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 116, 110, -1));
-
-        jLabel18.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel18.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel18.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel18.setText("Phone :");
-        jPanel3.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 156, 110, -1));
-
-        jLabel16.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel16.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel16.setText("Dentist :");
-        jPanel3.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 196, 80, -1));
-
-        jLabel12.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel12.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel12.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel12.setText("Treatment :");
-        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 236, 80, -1));
-
-        jLabel13.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel13.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel13.setText("Appoinment Date :");
-        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 276, 138, -1));
-
-        jLabel14.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel14.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel14.setText("Appoinment Time :");
-        jPanel3.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 316, 129, -1));
-
-        jLabel15.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel15.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel15.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel15.setText(" Treatment Cost:");
-        jPanel3.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 363, 129, -1));
-
-        jLabel19.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel19.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel19.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel19.setText("Consultation Fee: ");
-        jPanel3.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 397, 129, -1));
-
-        jLabel20.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel20.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel20.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel20.setText("Total Amount :");
-        jPanel3.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 442, 119, -1));
-
-        jLabel21.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel21.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel21.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel21.setText("Bill Date :");
-        jPanel3.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 520, 119, -1));
-
-        jLabel7.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel7.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel7.setText("Appoinment No:");
-        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 78, 138, -1));
-        jPanel3.add(txtBillNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 6, 154, -1));
+        jLabel6.setText("Search :");
+        jPanel3.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 60, 138, -1));
 
         btnSearch.setText("Search");
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -195,18 +169,7 @@ public class ViewBillingForm extends javax.swing.JFrame {
                 btnSearchActionPerformed(evt);
             }
         });
-        jPanel3.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(771, 6, -1, -1));
-        jPanel3.add(txtAppointmentNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 76, 154, -1));
-        jPanel3.add(txtPatientName, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 116, 154, -1));
-        jPanel3.add(txtPhone, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 156, 154, -1));
-        jPanel3.add(txtDentist, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 196, 154, -1));
-        jPanel3.add(txtTreatment, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 236, 154, -1));
-        jPanel3.add(txtAppointmentDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 276, 154, -1));
-        jPanel3.add(txtAppointmentTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 316, 154, -1));
-        jPanel3.add(txtTreatmentCost, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 363, 154, -1));
-        jPanel3.add(txtConsultationFee, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 397, 154, -1));
-        jPanel3.add(txtTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 442, 154, -1));
-        jPanel3.add(txtPaymentStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 482, 154, -1));
+        jPanel3.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 60, -1, -1));
 
         btnPrintRecipt.setText("Print Receipt");
         btnPrintRecipt.addActionListener(new java.awt.event.ActionListener() {
@@ -214,7 +177,7 @@ public class ViewBillingForm extends javax.swing.JFrame {
                 btnPrintReciptActionPerformed(evt);
             }
         });
-        jPanel3.add(btnPrintRecipt, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 560, -1, -1));
+        jPanel3.add(btnPrintRecipt, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 400, -1, -1));
 
         btnClear.setText("Clear");
         btnClear.addActionListener(new java.awt.event.ActionListener() {
@@ -222,17 +185,39 @@ public class ViewBillingForm extends javax.swing.JFrame {
                 btnClearActionPerformed(evt);
             }
         });
-        jPanel3.add(btnClear, new org.netbeans.lib.awtextra.AbsoluteConstraints(488, 560, -1, -1));
+        jPanel3.add(btnClear, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 400, -1, -1));
 
         btnBack.setText("Back");
-        jPanel3.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 560, -1, -1));
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 400, -1, -1));
 
-        jLabel22.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel22.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel22.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel22.setText("payment Status :");
-        jPanel3.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(299, 482, 119, -1));
-        jPanel3.add(txtBillDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(542, 522, 154, -1));
+        tblViewBill.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Bill No", "Appoinment", "Patient", "Treatment", "Cost", "Consult", "Total"
+            }
+        ));
+        jScrollPane1.setViewportView(tblViewBill);
+
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 140, 770, 220));
+        jPanel3.add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 60, 140, -1));
+
+        btnViewAll.setText("View All");
+        btnViewAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewAllActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnViewAll, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 60, -1, -1));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -240,12 +225,13 @@ public class ViewBillingForm extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(65, 65, 65)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 1012, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(72, 72, 72))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -253,8 +239,8 @@ public class ViewBillingForm extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 604, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(70, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -276,177 +262,107 @@ public class ViewBillingForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        
-    String billNumber =
-            txtBillNumber.getText().trim();
+        String billNumber = txtSearch.getText().trim();
 
     if (billNumber.isEmpty()) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Please enter bill number."
-        );
-
+        JOptionPane.showMessageDialog(this, "Please enter a bill number.");
         return;
     }
 
-    try {
+    Bill bill = billController.searchBill(billNumber);
 
-        Bill bill =
-                billController.searchBill(billNumber);
-
-        if (bill == null) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Bill not found."
-            );
-
-            clearFields();
-            return;
-        }
-
-        txtAppointmentNumber.setText(
-                bill.getAppointmentNumber()
-        );
-
-        txtPatientName.setText(
-                bill.getPatientName()
-        );
-
-        txtPhone.setText(
-                bill.getPhoneNumber()
-        );
-
-        txtDentist.setText(
-                bill.getDentistName()
-        );
-
-        txtTreatment.setText(
-                bill.getTreatmentName()
-        );
-
-        txtAppointmentDate.setText(
-                bill.getAppointmentDate().toString()
-        );
-
-        txtAppointmentTime.setText(
-                bill.getAppointmentTime()
-        );
-
-        txtTreatmentCost.setText(
-                bill.getTreatmentCost().toString()
-        );
-
-        txtConsultationFee.setText(
-                bill.getConsultationFee().toString()
-        );
-
-        txtTotal.setText(
-                bill.getTotalAmount().toString()
-        );
-
-        txtPaymentStatus.setText(
-                bill.getPaymentStatus()
-        );
-
-        txtBillDate.setText(
-                bill.getBillDate().toString()
-        );
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Bill found successfully."
-        );
-
-    } catch (Exception e) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Error searching bill: "
-                + e.getMessage()
-        );
+    if (bill == null) {
+        JOptionPane.showMessageDialog(this, "Bill not found.");
+        clearTable();
+        return;
     }
+
+    DefaultTableModel model = (DefaultTableModel) tblViewBill.getModel();
+    model.setRowCount(0);
+
+    model.addRow(new Object[]{
+        bill.getBillNumber(),
+        bill.getAppointmentNumber(),
+        bill.getPatientName(),
+        bill.getTreatmentName(),
+        bill.getTreatmentCost(),
+        bill.getConsultationFee(),
+        bill.getTotalAmount(),
+        bill.getPaymentStatus(),
+        bill.getBillDate()
+    }); 
+ 
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
-        clearFields();
+      txtSearch.setText("");
+    loadAllBills();
+    tblViewBill.clearSelection();
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnPrintReciptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintReciptActionPerformed
-          String billNumber =
-            txtBillNumber.getText().trim();
+          int selectedRow = tblViewBill.getSelectedRow();
 
-    // Check whether a bill has been searched
-    if (billNumber.isEmpty()) {
-
+    if (selectedRow == -1) {
         JOptionPane.showMessageDialog(
                 this,
-                "Please search for a bill first."
+                "Please select a bill from the table."
         );
-
         return;
     }
 
-    try {
+    String billNumber = tblViewBill.getValueAt(selectedRow, 0).toString();
 
-        // Get the bill from database
-        Bill bill =
-                billController.searchBill(
-                        billNumber
-                );
+    Bill bill = billController.searchBill(billNumber);
 
-        if (bill == null) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Bill not found."
-            );
-
-            return;
-        }
-
-        // Generate PDF receipt
-        File pdfFile =
-                ReceiptPDF.generateReceipt(bill);
-
-        // Open the generated PDF
-        java.awt.Desktop.getDesktop().open(pdfFile);
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Receipt generated successfully."
-        );
-
-    } catch (Exception e) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Error generating receipt: "
-                + e.getMessage()
-        );
+    if (bill == null) {
+        JOptionPane.showMessageDialog(this, "Bill not found.");
+        return;
     }
+
+try {
+    ReceiptPDF.generateReceipt(bill);
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Receipt generated successfully."
+    );
+
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(
+            this,
+            "Error generating receipt: " + e.getMessage()
+    );
+}
     }//GEN-LAST:event_btnPrintReciptActionPerformed
 
-    
-    private void clearFields() {
+    private void btnViewAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewAllActionPerformed
+       txtSearch.setText("");
+    loadAllBills();
+    }//GEN-LAST:event_btnViewAllActionPerformed
 
-    txtBillNumber.setText("");
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        if (loggedInUser != null
+            && loggedInUser.getRole().equalsIgnoreCase("Admin")) {
 
-    txtAppointmentNumber.setText("");
-    txtPatientName.setText("");
-    txtPhone.setText("");
-    txtDentist.setText("");
-    txtTreatment.setText("");
-    txtAppointmentDate.setText("");
-    txtAppointmentTime.setText("");
-    txtTreatmentCost.setText("");
-    txtConsultationFee.setText("");
-    txtTotal.setText("");
-    txtPaymentStatus.setText("");
-    txtBillDate.setText("");
+        new AdminDashboardForm(loggedInUser).setVisible(true);
+
+    } else if (loggedInUser != null
+            && loggedInUser.getRole().equalsIgnoreCase("Reception")) {
+
+        new ReceptionDashboardForm(loggedInUser).setVisible(true);
+
+    } else {
+        new AdminDashboardForm().setVisible(true);
+    }
+
+    this.dispose();
+    }//GEN-LAST:event_btnBackActionPerformed
+
+private void clearTable() {
+    DefaultTableModel model = (DefaultTableModel) tblViewBill.getModel();
+    model.setRowCount(0);
 }
-    
     
     /**
      * @param args the command line arguments
@@ -488,35 +404,14 @@ public class ViewBillingForm extends javax.swing.JFrame {
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnPrintRecipt;
     private javax.swing.JButton btnSearch;
+    private javax.swing.JButton btnViewAll;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JTextField txtAppointmentDate;
-    private javax.swing.JTextField txtAppointmentNumber;
-    private javax.swing.JTextField txtAppointmentTime;
-    private javax.swing.JTextField txtBillDate;
-    private javax.swing.JTextField txtBillNumber;
-    private javax.swing.JTextField txtConsultationFee;
-    private javax.swing.JTextField txtDentist;
-    private javax.swing.JTextField txtPatientName;
-    private javax.swing.JTextField txtPaymentStatus;
-    private javax.swing.JTextField txtPhone;
-    private javax.swing.JTextField txtTotal;
-    private javax.swing.JTextField txtTreatment;
-    private javax.swing.JTextField txtTreatmentCost;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblViewBill;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

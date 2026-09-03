@@ -1,43 +1,40 @@
 package model;
 
-//LocalDate allows Java to properly work with dates.
 import java.time.LocalDate;
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 
-/**
- *
- * @author Radil_Sanjuna
- */
 public class Patient {
+
     private int patientId;
-private String fullName;
-private String address;
-private String phoneNumber;
-private LocalDate dateOfBirth;
-private String gender;
+    private String fullName;
+    private String address;
+    private String phoneNumber;
+    private String email;
+    private LocalDate dateOfBirth;
+    private String gender;
 
-public Patient() {
-}
+    public Patient() {
+    }
 
-public Patient(int patientId, String fullName, String address, String phoneNumber, LocalDate dateOfBirth, String gender) {
-    this.patientId = patientId;
-    this.fullName = fullName;
-    this.address = address;
-    this.phoneNumber = phoneNumber;
-    this.dateOfBirth = dateOfBirth;
-    this.gender = gender;
-}
+    public Patient(int patientId, String fullName, String address, String phoneNumber,
+            String email, LocalDate dateOfBirth, String gender) {
+        this.patientId = patientId;
+        this.fullName = fullName;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+    }
 
-public Patient(String fullName, String address, String phoneNumber, LocalDate dateOfBirth, String gender) {
-    this.fullName = fullName;
-    this.address = address;
-    this.phoneNumber = phoneNumber;
-    this.dateOfBirth = dateOfBirth;
-    this.gender = gender;
-}
+    public Patient(String fullName, String address, String phoneNumber,
+            String email, LocalDate dateOfBirth, String gender) {
+        this.fullName = fullName;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+    }
 
     public int getPatientId() {
         return patientId;
@@ -71,6 +68,14 @@ public Patient(String fullName, String address, String phoneNumber, LocalDate da
         this.phoneNumber = phoneNumber;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
@@ -86,8 +91,4 @@ public Patient(String fullName, String address, String phoneNumber, LocalDate da
     public void setGender(String gender) {
         this.gender = gender;
     }
-
-
-
-
 }

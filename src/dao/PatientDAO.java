@@ -19,11 +19,11 @@ import java.util.List;
 
 public class PatientDAO {
     
-    public boolean addPatient(Patient patient) {
+public boolean addPatient(Patient patient) {
 
-    String sql = "INSERT INTO patients " +
-                 "(full_name, address, phone_number, dob, gender) " +
-                 "VALUES (?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO patients "
+            + "(full_name, address, phone_number, email, dob, gender) "
+            + "VALUES (?, ?, ?, ?, ?, ?)";
 
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -31,8 +31,9 @@ public class PatientDAO {
         stmt.setString(1, patient.getFullName());
         stmt.setString(2, patient.getAddress());
         stmt.setString(3, patient.getPhoneNumber());
-        stmt.setDate(4, Date.valueOf(patient.getDateOfBirth()));
-        stmt.setString(5, patient.getGender());
+        stmt.setString(4, patient.getEmail());
+        stmt.setDate(5, Date.valueOf(patient.getDateOfBirth()));
+        stmt.setString(6, patient.getGender());
 
         return stmt.executeUpdate() > 0;
 
@@ -42,9 +43,7 @@ public class PatientDAO {
     }
 }
     
-    
-    
-  public Patient getPatientByIdOrPhone(String searchText) {
+ public Patient getPatientByIdOrPhone(String searchText) {
 
     String sql = "SELECT * FROM patients "
             + "WHERE patient_id = ? "
@@ -71,6 +70,7 @@ public class PatientDAO {
                 patient.setFullName(rs.getString("full_name"));
                 patient.setAddress(rs.getString("address"));
                 patient.setPhoneNumber(rs.getString("phone_number"));
+                patient.setEmail(rs.getString("email"));
 
                 if (rs.getDate("dob") != null) {
                     patient.setDateOfBirth(rs.getDate("dob").toLocalDate());
@@ -87,16 +87,16 @@ public class PatientDAO {
     return patient;
 }
    
-    
-    public boolean updatePatient(Patient patient) {
+public boolean updatePatient(Patient patient) {
 
-    String sql = "UPDATE patients SET " +
-                 "full_name = ?, " +
-                 "address = ?, " +
-                 "phone_number = ?, " +
-                 "dob = ?, " +
-                 "gender = ? " +
-                 "WHERE patient_id = ?";
+    String sql = "UPDATE patients SET "
+            + "full_name = ?, "
+            + "address = ?, "
+            + "phone_number = ?, "
+            + "email = ?, "
+            + "dob = ?, "
+            + "gender = ? "
+            + "WHERE patient_id = ?";
 
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -104,9 +104,10 @@ public class PatientDAO {
         stmt.setString(1, patient.getFullName());
         stmt.setString(2, patient.getAddress());
         stmt.setString(3, patient.getPhoneNumber());
-        stmt.setDate(4, Date.valueOf(patient.getDateOfBirth()));
-        stmt.setString(5, patient.getGender());
-        stmt.setInt(6, patient.getPatientId());
+        stmt.setString(4, patient.getEmail());
+        stmt.setDate(5, Date.valueOf(patient.getDateOfBirth()));
+        stmt.setString(6, patient.getGender());
+        stmt.setInt(7, patient.getPatientId());
 
         return stmt.executeUpdate() > 0;
 
@@ -134,8 +135,7 @@ public class PatientDAO {
     }
 }
     
-// need to understand this how this work what is the pattern in here
-    public List<Patient> getAllPatients() {
+public List<Patient> getAllPatients() {
 
     List<Patient> patients = new ArrayList<>();
 
@@ -148,12 +148,13 @@ public class PatientDAO {
         while (rs.next()) {
 
             Patient patient = new Patient(
-                rs.getInt("patient_id"),
-                rs.getString("full_name"),
-                rs.getString("address"),
-                rs.getString("phone_number"),
-                rs.getDate("dob").toLocalDate(),
-                rs.getString("gender")
+                    rs.getInt("patient_id"),
+                    rs.getString("full_name"),
+                    rs.getString("address"),
+                    rs.getString("phone_number"),
+                    rs.getString("email"),
+                    rs.getDate("dob").toLocalDate(),
+                    rs.getString("gender")
             );
 
             patients.add(patient);

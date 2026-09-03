@@ -7,7 +7,8 @@ package controller;
 import dao.BillDAO;
 import java.math.BigDecimal;
 import model.Bill;
-
+import java.util.List;
+import model.Bill;
 import java.util.List;
 
 public class BillController {
@@ -49,4 +50,5 @@ public class BillController {
 
     return treatmentCost.add(consultationFee);
 }
+
 }

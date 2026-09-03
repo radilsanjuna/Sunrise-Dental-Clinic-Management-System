@@ -21,6 +21,8 @@ import java.time.LocalTime;
 
 import model.Appointment;
 import model.User;
+
+import util.EmailService;
 /**
  *
  * @author Radil_Sanjuna
@@ -1221,7 +1223,7 @@ private void clearFields() {
     }//GEN-LAST:event_cmbYearActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-         // Validate patient
+     // Validate patient
     if (txtPatientId.getText().trim().isEmpty()) {
         JOptionPane.showMessageDialog(
                 this,
@@ -1335,18 +1337,53 @@ private void clearFields() {
                         appointment
                 );
 
-     if (success) {
+        if (success) {
 
-    JOptionPane.showMessageDialog(
-            this,
-            "Appointment registered successfully.\n"
-            + "Appointment Number: "
-            + appointment.getAppointmentNumber()
-    );
+            // Get patient details including email
+            Patient patient =
+                    patientController.searchPatientByIdOrPhone(
+                            String.valueOf(patientId)
+                    );
 
-    loadAppointments();
-    clearFields();
-}else {
+            // Send appointment confirmation email
+            if (patient != null
+                    && patient.getEmail() != null
+                    && !patient.getEmail().trim().isEmpty()) {
+
+                String dentistName =
+                        cmbDentist.getSelectedItem().toString();
+
+                String treatmentName =
+                        cmbTreatment.getSelectedItem().toString();
+
+                EmailService.sendAppointmentConfirmation(
+                        patient.getEmail(),
+                        patient.getFullName(),
+                        appointment.getAppointmentNumber(),
+                        dentistName,
+                        appointmentDate.toString(),
+                        appointmentTime.toString(),
+                        treatmentName
+                );
+
+            } else {
+
+                System.out.println(
+                        "Patient email not available. Appointment email was not sent."
+                );
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Appointment registered successfully.\n"
+                    + "Appointment Number: "
+                    + appointment.getAppointmentNumber()
+            );
+
+            loadAppointments();
+            clearFields();
+
+        } else {
 
             JOptionPane.showMessageDialog(
                     this,

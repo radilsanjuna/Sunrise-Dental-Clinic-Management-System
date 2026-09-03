@@ -67,6 +67,11 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
         });
 
         btnBilling.setText("View Bill");
+        btnBilling.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBillingActionPerformed(evt);
+            }
+        });
 
         btnCreatappoinment.setText("Dentist Schedule");
         btnCreatappoinment.addActionListener(new java.awt.event.ActionListener() {
@@ -248,6 +253,12 @@ public class ReceptionDashboardForm extends javax.swing.JFrame {
         billingForm.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnManageappoinmentActionPerformed
+
+    private void btnBillingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBillingActionPerformed
+         ViewBillingForm billingForm = new ViewBillingForm(loggedInUser);
+    billingForm.setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_btnBillingActionPerformed
 
     /**
      * @param args the command line arguments

@@ -210,53 +210,46 @@ public class BillDAO {
         return null;
     }
 
-    // Get all bills
-    public List<Bill> getAllBills() {
+ // Get all bills
+public List<Bill> getAllBills() {
+    List<Bill> bills = new ArrayList<>();
 
-        List<Bill> billList = new ArrayList<>();
+    String sql = "SELECT b.*, "
+            + "a.appointment_number, "
+            + "a.appointment_date, "
+            + "a.appointment_time, "
+            + "p.full_name AS patient_name, "
+            + "p.phone_number, "
+            + "u.full_name AS dentist_name, "
+            + "t.treatment_name, "
+            + "t.cost AS treatment_cost "
+            + "FROM bills b "
+            + "JOIN appointments a "
+            + "ON b.appointment_id = a.appointment_id "
+            + "JOIN patients p "
+            + "ON a.patient_id = p.patient_id "
+            + "JOIN dentists d "
+            + "ON a.dentist_id = d.dentist_id "
+            + "JOIN users u "
+            + "ON d.user_id = u.user_id "
+            + "JOIN treatments t "
+            + "ON a.treatment_id = t.treatment_id "
+            + "ORDER BY b.bill_date DESC";
 
-        String sql = "SELECT b.*, "
-                + "a.appointment_number, "
-                + "a.appointment_date, "
-                + "a.appointment_time, "
-                + "p.full_name AS patient_name, "
-                + "p.phone_number, "
-                + "u.full_name AS dentist_name, "
-                + "t.treatment_name, "
-                + "t.cost AS treatment_cost "
-                + "FROM bills b "
-                + "JOIN appointments a "
-                + "ON b.appointment_id = a.appointment_id "
-                + "JOIN patients p "
-                + "ON a.patient_id = p.patient_id "
-                + "JOIN dentists d "
-                + "ON a.dentist_id = d.dentist_id "
-                + "JOIN users u "
-                + "ON d.user_id = u.user_id "
-                + "JOIN treatments t "
-                + "ON a.treatment_id = t.treatment_id "
-                + "ORDER BY b.bill_id DESC";
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-
-                billList.add(
-                        createBillFromResultSet(rs)
-                );
-            }
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    "Error loading bills: " + e.getMessage()
-            );
+        while (rs.next()) {
+            bills.add(createBillFromResultSet(rs));
         }
 
-        return billList;
+    } catch (Exception e) {
+        System.out.println("Error loading bills: " + e.getMessage());
     }
+
+    return bills;
+}
 
     // Generate the next bill number
     public String generateBillNumber() {
